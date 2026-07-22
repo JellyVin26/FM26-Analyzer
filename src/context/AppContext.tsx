@@ -45,6 +45,7 @@ interface AppState {
   addComparePlayer: (id: number, navigate?: boolean) => void;
   removeComparePlayer: (id: number) => void;
   clearComparePlayers: () => void;
+  unloadDump: () => void;
   filteredPlayers: Player[];
 }
 
@@ -68,6 +69,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [comparedIds, setComparedIds] = useState<number[]>([]);
 
   const setDump = useCallback((d: Dump) => { setDump_(d); }, []);
+  const unloadDump = useCallback(() => { setDump_(null); }, []);
   const setFilter = useCallback((k: keyof Filters, v: string) => {
     setFilters((f) => ({ ...f, [k]: v }));
   }, []);
@@ -172,7 +174,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     <Ctx.Provider value={{
       dump, loading, hiddenMode, filters, sortKey, sortDir, selectedId,
       activeTab, comparedIds,
-      setDump, setLoading, setHiddenMode, setFilter, resetFilters, setSort,
+      setDump, unloadDump, setLoading, setHiddenMode, setFilter, resetFilters, setSort,
       setSelectedId, setActiveTab, addComparePlayer, removeComparePlayer, clearComparePlayers,
       filteredPlayers,
     }}>

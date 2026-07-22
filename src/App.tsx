@@ -11,7 +11,7 @@ import { BuySellLoanAdvisor } from "./components/BuySellLoanAdvisor";
 import { useLoadDump } from "./hooks/useLoadDump";
 
 function TopBar() {
-  const { dump, activeTab, setActiveTab, comparedIds } = useApp();
+  const { dump, activeTab, setActiveTab, comparedIds, unloadDump } = useApp();
   const { loadFile, loadFromAutoDump } = useLoadDump();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -73,8 +73,11 @@ function TopBar() {
           <button className="btn primary" onClick={() => loadFromAutoDump()} title="Sync updated save state from FM26">
             ⚡ Sync Live Save
           </button>
-          <button className="btn" onClick={() => inputRef.current?.click()}>
+          <button className="btn" onClick={() => inputRef.current?.click()} title="Load another dump file">
             📂 Load file
+          </button>
+          <button className="btn danger" onClick={() => unloadDump()} title="Clear current save data from view">
+            ✕ Clear
           </button>
         </div>
       )}
