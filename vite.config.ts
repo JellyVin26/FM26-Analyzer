@@ -29,6 +29,7 @@ export default defineConfig({
             fs.createReadStream(dumpPath).pipe(res);
           } else {
             res.statusCode = 404;
+            res.setHeader('Access-Control-Allow-Origin', '*');
             res.end(JSON.stringify({ error: `data.json not found` }));
           }
         });
@@ -80,6 +81,7 @@ export default defineConfig({
             fs.createReadStream(dumpPath).pipe(res);
           } else {
             res.statusCode = 504;
+            res.setHeader('Access-Control-Allow-Origin', '*');
             res.end(JSON.stringify({ error: 'Timeout waiting for game to dump data. Is FM26 running?' }));
           }
         });

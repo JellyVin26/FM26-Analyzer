@@ -23,6 +23,7 @@ app.get('/api/dump', (req, res) => {
     res.setHeader('Expires', '0');
     fs.createReadStream(dumpPath).pipe(res);
   } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.status(404).json({ error: `data.json not found at ${dumpPath}` });
   }
 });
@@ -74,6 +75,7 @@ app.get('/api/sync', async (req, res) => {
     res.setHeader('Expires', '0');
     fs.createReadStream(dumpPath).pipe(res);
   } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.status(504).json({ error: 'Timeout waiting for game to dump data. Is FM26 running?' });
   }
 });
