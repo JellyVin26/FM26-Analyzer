@@ -77,6 +77,7 @@ export function BuySellLoanAdvisor() {
         const matchesPosition = weakGroupCodes.length > 0
           ? weakGroupCodes.some((m) => (p.posArr && p.posArr.some((pa) => pa === m || pa.startsWith(m))) || p.pos?.includes(m))
           : true;
+        if (p.notForSale) return false; // ← exclude players not for sale
         return matchesPosition;
       })
       .map((p) => {
