@@ -464,7 +464,7 @@ internal static class Dumper
 
         int lf = Attr(m, pl + (ulong)Fields.PLAO_ATTRS + Fields.FOOT_LEFT);
         int rf = Attr(m, pl + (ulong)Fields.PLAO_ATTRS + Fields.FOOT_RIGHT);
-        e.Foot = (rf >= 14 && lf >= 14) ? "Beide" : (rf >= lf ? "Rechts" : "Links");
+        e.Foot = (rf >= 14 && lf >= 14) ? "Both" : (rf >= lf ? "Right" : "Left");
 
         // posities
         var pos = new List<(string k, int v)>();
@@ -539,7 +539,7 @@ internal static class Dumper
             e.Expires = FmDateIso(m.U32(con + Fields.CON_EXPIRY));
             e.Job = JobName(m.U8(con + 0x26));   // pero.Pcjo — echte functie uit contract
         }
-        if (string.IsNullOrEmpty(e.Job)) e.Job = "Staflid";
+        if (string.IsNullOrEmpty(e.Job)) e.Job = "Staff";
         e.Gender = (m.U8(person + (ulong)Fields.PERO_GENDER) & Fields.GENDER_FEMALE_BIT) != 0 ? 1 : 0;
         var (sclub, _, sdiv) = ResolveClub(m, person);
         e.Club = sclub; e.Div = sdiv;
@@ -641,18 +641,18 @@ internal static class Dumper
     // Echte functie uit personJobTypes-enum (byte op contract+0x26).
     private static readonly Dictionary<int, string> Jobs = new()
     {
-        [1] = "Speler", [2] = "Coach", [3] = "Speler/Coach", [4] = "Voorzitter",
-        [6] = "Directeur", [8] = "Algemeen directeur", [10] = "Technisch directeur",
-        [12] = "Fysiotherapeut", [14] = "Scout", [16] = "Manager", [17] = "Speler/Manager",
-        [20] = "Assistent-manager", [21] = "Speler/Assistent-manager", [22] = "Media-analist",
-        [24] = "Algemeen manager", [26] = "Fitnesscoach", [27] = "Speler/Fitnesscoach",
-        [34] = "Keeperstrainer", [35] = "Speler/Keeperstrainer", [36] = "Hoofd data-analyse",
-        [38] = "Clubarts", [40] = "Hoofd sportwetenschap", [42] = "Data-analist",
-        [44] = "Hoofdscout", [45] = "Speler/Hoofdscout", [46] = "Arts", [48] = "Sportwetenschapper",
-        [49] = "Speler/Jeugdtrainer", [50] = "Hoofd fysiotherapie", [52] = "U19-manager",
-        [54] = "Trainer eerste elftal", [64] = "Hoofd jeugdopleiding", [65] = "Speler/Hoofd jeugd",
-        [66] = "Eigenaar", [70] = "President", [86] = "Loanmanager", [88] = "Technisch directeur",
-        [144] = "Interim-manager",
+        [1] = "Player", [2] = "Coach", [3] = "Player/Coach", [4] = "Chairman",
+        [6] = "Director", [8] = "General Manager", [10] = "Technical Director",
+        [12] = "Physio", [14] = "Scout", [16] = "Manager", [17] = "Player/Manager",
+        [20] = "Assistant Manager", [21] = "Player/Assistant Manager", [22] = "Press Officer",
+        [24] = "General Manager", [26] = "Fitness Coach", [27] = "Player/Fitness Coach",
+        [34] = "Goalkeeping Coach", [35] = "Player/Goalkeeping Coach", [36] = "Head Performance Analyst",
+        [38] = "Club Doctor", [40] = "Head of Sports Science", [42] = "Performance Analyst",
+        [44] = "Chief Scout", [45] = "Player/Chief Scout", [46] = "Doctor", [48] = "Sports Scientist",
+        [49] = "Player/Youth Coach", [50] = "Head Physio", [52] = "U19 Manager",
+        [54] = "First Team Coach", [64] = "Head of Youth Development", [65] = "Player/Head of Youth",
+        [66] = "Owner", [70] = "President", [86] = "Loan Manager", [88] = "Technical Director",
+        [144] = "Interim Manager",
     };
     private static string JobName(int v) => Jobs.TryGetValue(v, out var s) ? s : null;
 
