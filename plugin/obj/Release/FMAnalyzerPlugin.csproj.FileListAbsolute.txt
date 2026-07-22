@@ -1,0 +1,9 @@
+C:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\FMAnalyzerPlugin.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\FMAnalyzerPlugin.AssemblyInfoInputs.cache
+C:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\FMAnalyzerPlugin.AssemblyInfo.cs
+C:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\FMAnalyzerPlugin.csproj.CoreCompileInputs.cache
+C:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\bin\Release\FMAnalyzer.dll
+C:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\FMAnalyzerPlugin.csproj.AssemblyReference.cache
+C:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\FMAnalyzer.dll
+C:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\refint\FMAnalyzer.dll
+C:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\ref\FMAnalyzer.dll
