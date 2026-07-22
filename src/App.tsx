@@ -56,7 +56,7 @@ function TopBar() {
 
       {dump && (
         <span className="topbar-meta" style={{ marginRight: 12 }}>
-          {dump.meta.myClub} · {dump.players.length.toLocaleString()} players
+          <strong>{dump.meta.myClub || "Active Save"}</strong> {dump.meta.gameVersion ? `(FM v${dump.meta.gameVersion})` : ""} · {dump.players.length.toLocaleString()} players loaded
         </span>
       )}
 
