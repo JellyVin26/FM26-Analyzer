@@ -83,14 +83,23 @@ app.use((req, res) => {
 });
 
 // Start the server and launch the browser
-app.listen(PORT, '0.0.0.0', async () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`FMAnalyzer Desktop Backend running on port ${PORT}`);
   console.log(`Opening browser automatically...`);
   
+  const url = `http://localhost:${PORT}`;
+  const { exec } = require('child_process');
+  
   try {
-    const { default: open } = await import('open');
-    await open(`http://localhost:${PORT}`);
+    const platform = os.platform();
+    if (platform === 'win32') {
+      exec(`start "" "${url}"`);
+    } else if (platform === 'darwin') {
+      exec(`open "${url}"`);
+    } else {
+      exec(`xdg-open "${url}"`);
+    }
   } catch (err) {
-    console.error("Failed to automatically open browser. Please navigate to http://localhost:5173");
+    console.error(`Failed to automatically open browser. Please navigate to ${url}`);
   }
 });
