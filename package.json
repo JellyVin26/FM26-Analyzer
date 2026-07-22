@@ -6,10 +6,13 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:exe": "npm run build && pkg server.cjs --targets node18-win-x64 --output FMAnalyzer.exe",
     "lint": "oxlint",
     "preview": "vite preview"
   },
   "dependencies": {
+    "express": "^5.2.1",
+    "open": "^11.0.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },
@@ -19,7 +22,15 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
     "oxlint": "^1.71.0",
+    "pkg": "^5.8.1",
     "typescript": "~6.0.2",
     "vite": "^8.1.1"
+  },
+  "pkg": {
+    "scripts": "dist/**/*.js",
+    "assets": "dist/**/*",
+    "targets": [
+      "node18-win-x64"
+    ]
   }
 }
