@@ -23,24 +23,26 @@ function scoreColor(n: number) {
   return "score-gray";
 }
 
-const VISIBLE_ATTRS: Array<[string, keyof Player["attrs"]]> = [
+const TECHNICAL_ATTRS: Array<[string, keyof Player["attrs"]]> = [
+  ["Corners", "Corners"], ["Crossing", "Crossing"], ["Dribbling", "Dribbling"],
+  ["Finishing", "Finishing"], ["First Touch", "FirstTouch"], ["Free Kicks", "FreeKicks"],
+  ["Heading", "Heading"], ["Long Shots", "LongShots"], ["Long Throws", "LongThrows"],
+  ["Marking", "Marking"], ["Passing", "Passing"], ["Penalty Taking", "PenaltyTaking"],
+  ["Tackling", "Tackling"], ["Technique", "Technique"],
+];
+
+const MENTAL_ATTRS: Array<[string, keyof Player["attrs"]]> = [
+  ["Aggression", "Aggression"], ["Anticipation", "Anticipation"], ["Bravery", "Bravery"],
+  ["Composure", "Composure"], ["Concentration", "Concentration"], ["Decisions", "Decisions"],
+  ["Determination", "Determination"], ["Flair", "Flair"], ["Leadership", "Leadership"],
+  ["Off the Ball", "OffTheBall"], ["Positioning", "Positioning"], ["Teamwork", "Teamwork"],
+  ["Vision", "Vision"], ["Work Rate", "WorkRate"],
+];
+
+const PHYSICAL_ATTRS: Array<[string, keyof Player["attrs"]]> = [
   ["Acceleration", "Acceleration"], ["Agility", "Agility"], ["Balance", "Balance"],
   ["Jumping Reach", "JumpingReach"], ["Natural Fitness", "NaturalFitness"],
   ["Pace", "Pace"], ["Stamina", "Stamina"], ["Strength", "Strength"],
-  ["Aggression", "Aggression"], ["Anticipation", "Anticipation"],
-  ["Bravery", "Bravery"], ["Composure", "Composure"],
-  ["Concentration", "Concentration"], ["Decisions", "Decisions"],
-  ["Determination", "Determination"], ["Flair", "Flair"],
-  ["Leadership", "Leadership"], ["Off the Ball", "OffTheBall"],
-  ["Positioning", "Positioning"], ["Teamwork", "Teamwork"],
-  ["Vision", "Vision"], ["Work Rate", "WorkRate"],
-  ["Corners", "Corners"], ["Crossing", "Crossing"],
-  ["Dribbling", "Dribbling"], ["Finishing", "Finishing"],
-  ["First Touch", "FirstTouch"], ["Free Kicks", "FreeKicks"],
-  ["Heading", "Heading"], ["Long Shots", "LongShots"],
-  ["Long Throws", "LongThrows"], ["Marking", "Marking"],
-  ["Passing", "Passing"], ["Penalty Taking", "PenaltyTaking"],
-  ["Tackling", "Tackling"], ["Technique", "Technique"],
 ];
 
 const HIDDEN_ATTRS: Array<[string, keyof Player]> = [
@@ -180,11 +182,43 @@ export function PlayerDrawer() {
             </div>
           </div>
 
-          {/* Attributes */}
+          {/* Technical Attributes */}
           <div>
-            <div className="drawer-section-title">Attributes</div>
+            <div className="drawer-section-title">Technical Attributes</div>
             <div className="attr-grid">
-              {VISIBLE_ATTRS.map(([label, key]) => {
+              {TECHNICAL_ATTRS.map(([label, key]) => {
+                const v = player.attrs[key as keyof typeof player.attrs] ?? 0;
+                return (
+                  <div key={key} className="attr-row">
+                    <span className="attr-name">{label}</span>
+                    <span className={`attr-val ${attrColor(v)}`}>{v}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Mental Attributes */}
+          <div>
+            <div className="drawer-section-title">Mental Attributes</div>
+            <div className="attr-grid">
+              {MENTAL_ATTRS.map(([label, key]) => {
+                const v = player.attrs[key as keyof typeof player.attrs] ?? 0;
+                return (
+                  <div key={key} className="attr-row">
+                    <span className="attr-name">{label}</span>
+                    <span className={`attr-val ${attrColor(v)}`}>{v}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Physical Attributes */}
+          <div>
+            <div className="drawer-section-title">Physical Attributes</div>
+            <div className="attr-grid">
+              {PHYSICAL_ATTRS.map(([label, key]) => {
                 const v = player.attrs[key as keyof typeof player.attrs] ?? 0;
                 return (
                   <div key={key} className="attr-row">

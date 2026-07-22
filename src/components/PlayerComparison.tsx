@@ -149,6 +149,8 @@ export function PlayerComparison() {
             </h3>
           </div>
 
+          <div /> {/* 200px metric column placeholder */}
+
           {comparedPlayers.map((p) => {
             const topIPs = topIpRoles(p, 3);
             return (
@@ -169,6 +171,8 @@ export function PlayerComparison() {
               Top FM26 Out-of-Possession (OOP) Roles
             </h3>
           </div>
+
+          <div /> {/* 200px metric column placeholder */}
 
           {comparedPlayers.map((p) => {
             const topOOPs = topOopRoles(p, 3);
