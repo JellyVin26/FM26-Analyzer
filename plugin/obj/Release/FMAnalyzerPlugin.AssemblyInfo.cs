@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FMAnalyzer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5b0aaa3f5c9ef0fb619644ba474837cd4df98b73")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c164a3b48517b0a29569c42c2867519444788e3e")]
 [assembly: System.Reflection.AssemblyProductAttribute("FMAnalyzer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FMAnalyzer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
