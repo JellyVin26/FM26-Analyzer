@@ -1,13 +1,18 @@
 import "./index.css";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useApp } from "./context/AppContext";
 import { Sidebar } from "./components/Sidebar";
 import { PlayerTable } from "./components/PlayerTable";
 import { PlayerDrawer } from "./components/PlayerDrawer";
 import { FileDrop } from "./components/FileDrop";
+import { PlayerComparison } from "./components/PlayerComparison";
+import { SquadGapAnalysis } from "./components/SquadGapAnalysis";
+import { BuySellLoanAdvisor } from "./components/BuySellLoanAdvisor";
 import { useLoadDump } from "./hooks/useLoadDump";
 
-function TopBar() {
+type TabView = "scout" | "compare" | "gaps" | "advisor";
+
+function TopBar({ activeTab, setActiveTab }: { activeTab: TabView; setActiveTab: (t: TabView) => void }) {
   const { dump } = useApp();
   const { loadFile } = useLoadDump();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -21,12 +26,41 @@ function TopBar() {
       </div>
 
       {dump && (
-        <span className="topbar-meta">
-          {dump.meta.gameVersion} · {dump.meta.myClub} · {dump.players.length.toLocaleString()} players
-        </span>
+        <nav style={{ display: "flex", gap: 8, marginLeft: 20 }}>
+          <button
+            className={`btn ${activeTab === "scout" ? "primary" : ""}`}
+            onClick={() => setActiveTab("scout")}
+          >
+            📋 Scout Table
+          </button>
+          <button
+            className={`btn ${activeTab === "compare" ? "primary" : ""}`}
+            onClick={() => setActiveTab("compare")}
+          >
+            ⚖️ Comparison
+          </button>
+          <button
+            className={`btn ${activeTab === "gaps" ? "primary" : ""}`}
+            onClick={() => setActiveTab("gaps")}
+          >
+            🛡️ Squad Gaps
+          </button>
+          <button
+            className={`btn ${activeTab === "advisor" ? "primary" : ""}`}
+            onClick={() => setActiveTab("advisor")}
+          >
+            💡 Recruitment Advisor
+          </button>
+        </nav>
       )}
 
       <div className="topbar-spacer" />
+
+      {dump && (
+        <span className="topbar-meta" style={{ marginRight: 12 }}>
+          {dump.meta.myClub} · {dump.players.length.toLocaleString()} players
+        </span>
+      )}
 
       <input
         ref={inputRef}
@@ -38,7 +72,7 @@ function TopBar() {
 
       {dump && (
         <button className="btn" onClick={() => inputRef.current?.click()}>
-          📂 Load new dump
+          📂 Load dump
         </button>
       )}
     </header>
@@ -47,18 +81,27 @@ function TopBar() {
 
 export function App() {
   const { dump, loading } = useApp();
+  const [activeTab, setActiveTab] = useState<TabView>("scout");
 
   return (
     <div className="app-shell">
       {loading && <div className="loading-bar" />}
-      <TopBar />
+      <TopBar activeTab={activeTab} setActiveTab={setActiveTab} />
       <div className="main-content">
         {dump ? (
-          <>
-            <Sidebar />
-            <PlayerTable />
-            <PlayerDrawer />
-          </>
+          activeTab === "scout" ? (
+            <>
+              <Sidebar />
+              <PlayerTable />
+              <PlayerDrawer />
+            </>
+          ) : activeTab === "compare" ? (
+            <PlayerComparison />
+          ) : activeTab === "gaps" ? (
+            <SquadGapAnalysis />
+          ) : (
+            <BuySellLoanAdvisor />
+          )
         ) : (
           <div style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <FileDrop />
