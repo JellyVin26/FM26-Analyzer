@@ -12,10 +12,12 @@ FM Analyzer is an independent, lightning-fast web application built for Football
 
 ## 📥 How to Download and Play
 You do not need to be a developer to run this app!
-1. Download the `FMAnalyzer.exe` and `FMAnalyzerPlugin.dll` files from the [Releases](#) tab.
-2. Place `FMAnalyzerPlugin.dll` into your Football Manager 2026 `BepInEx/plugins` folder to enable live memory reading.
-3. Double-click `FMAnalyzer.exe`. It will automatically start the background server and open your default web browser to the app.
-4. Click **⚡ Sync Live Save** to pull your data!
+
+1. Go to the [Releases](https://github.com/JellyVin26/FM26-Analyzer/releases) tab.
+2. Download the latest **`FMAnalyzer-Setup.exe`**.
+3. Double-click the installer. It will automatically ask you to select your Football Manager 2026 directory so it can securely install the memory-reading plugin.
+4. The installer will place a shortcut to `FMAnalyzer` directly on your Desktop!
+5. Open the app from your Desktop and click **⚡ Sync Live Save** to pull your data!
 
 ## 💻 Developer Setup
 If you want to modify the React frontend or the Express backend:
