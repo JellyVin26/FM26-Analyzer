@@ -51,5 +51,33 @@ export function useLoadDump() {
     }
   }, [setDump, setLoading]);
 
-  return { loadFile, loadFromAutoDump, error };
+  const syncLiveSave = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/sync?t=${Date.now()}`, {
+        cache: "no-store"
+      });
+      if (!res.ok) {
+        if (res.status === 504) {
+          throw new Error("Timeout waiting for game data. Is FM26 running?");
+        }
+        throw new Error("Failed to trigger live sync.");
+      }
+      const data: Dump = await res.json();
+      if (!data.players || !Array.isArray(data.players)) {
+        throw new Error("Not a valid FMSuperScout dump.json.");
+      }
+      setDump(data);
+      localStorage.setItem(DUMP_PATH_KEY, "live_sync.json");
+      return true;
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Live sync failed.");
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, [setDump, setLoading]);
+
+  return { loadFile, loadFromAutoDump, syncLiveSave, error };
 }

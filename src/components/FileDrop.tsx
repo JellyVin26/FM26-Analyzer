@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type DragEvent } from "react";
 import { useLoadDump } from "../hooks/useLoadDump";
 
 export function FileDrop() {
-  const { loadFile, loadFromAutoDump, error } = useLoadDump();
+  const { loadFile, loadFromAutoDump, syncLiveSave, error } = useLoadDump();
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [checking, setChecking] = useState(true);
@@ -33,10 +33,10 @@ export function FileDrop() {
         <button
           className="btn primary"
           style={{ padding: "12px 24px", fontSize: 14, borderRadius: 10, justifyContent: "center" }}
-          onClick={() => loadFromAutoDump()}
+          onClick={() => { setChecking(true); syncLiveSave().finally(() => setChecking(false)); }}
           disabled={checking}
         >
-          {checking ? "⏳ Scanning live FM26 save..." : "⚡ Sync Live FM26 Save"}
+          {checking ? "⏳ Waiting for FM26 game data..." : "⚡ Sync Live Save"}
         </button>
 
         <button
