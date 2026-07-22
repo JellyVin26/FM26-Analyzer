@@ -38,7 +38,7 @@ export function FileDrop() {
           style={{ padding: "10px 24px", fontSize: 13, borderRadius: 10, justifyContent: "center" }}
           onClick={() => inputRef.current?.click()}
         >
-          📂 Select dump.json manually…
+          📂 Select a .json file manually…
         </button>
       </div>
 
@@ -58,7 +58,7 @@ export function FileDrop() {
         style={{ marginTop: 14, width: "100%", maxWidth: 340 }}
       >
         <div style={{ fontSize: 18, opacity: 0.4 }}>⬇</div>
-        <div className="drop-sub" style={{ fontSize: 11 }}>or drag &amp; drop dump.json here</div>
+        <div className="drop-sub" style={{ fontSize: 11 }}>or drag &amp; drop a .json file here</div>
       </div>
 
       {error && !checking && (
