@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useApp } from "../context/AppContext";
 import { topIpRoles, topOopRoles } from "../engine/ratingEngine";
+import { getPlayerValue } from "../utils/valueUtils";
 
 function fmt(v: number) {
   if (v >= 1_000_000) return `£${(v / 1_000_000).toFixed(1)}M`;
@@ -71,12 +72,12 @@ export function BuySellLoanAdvisor() {
         const matchesPosition = weakGroupCodes.length > 0
           ? weakGroupCodes.some((m) => (p.posArr && p.posArr.some((pa) => pa === m || pa.startsWith(m))) || p.pos?.includes(m))
           : true;
-        if (p.notForSale) return false; // ← exclude players not for sale
+        if (p.notForSale || (p.club && getPlayerValue(p) === 0)) return false; // ← exclude players not for sale
         return matchesPosition;
       })
       .map((p) => {
         const topIP = topIpRoles(p, 1)[0];
-        const estValue = p.value || 5_000_000;
+        const estValue = getPlayerValue(p) || 5_000_000;
         const lowBand = fmt(Math.round(estValue * 0.75));
         const highBand = fmt(Math.round(estValue * 1.25));
 
