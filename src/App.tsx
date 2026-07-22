@@ -72,19 +72,32 @@ function TopBar() {
         onChange={(e) => { const f = e.target.files?.[0]; if (f) loadFile(f); }}
       />
 
-      {dump && (
-        <div style={{ display: "flex", gap: 8 }}>
-          <button className="btn primary" onClick={handleSync} title="Sync updated save state directly from FM26">
-            ⚡ Sync Live Save
-          </button>
-          <button className="btn" onClick={() => inputRef.current?.click()} title="Load another dump file">
-            📂 Load file
-          </button>
-          <button className="btn danger" onClick={() => unloadDump()} title="Clear current save data from view">
-            ✕ Clear
-          </button>
-        </div>
-      )}
+      <div style={{ display: "flex", gap: 8 }}>
+        <a 
+          href="https://ko-fi.com/fmanalyzer" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="btn" 
+          style={{ backgroundColor: "#13C3FF", color: "#fff", border: "none", fontWeight: 600, padding: "0 16px" }}
+          title="Support the development of FM Analyzer on Ko-fi"
+        >
+          ☕ Support Me
+        </a>
+        
+        {dump && (
+          <>
+            <button className="btn primary" onClick={handleSync} title="Sync updated save state directly from FM26">
+              ⚡ Sync Live Save
+            </button>
+            <button className="btn" onClick={() => inputRef.current?.click()} title="Load another dump file">
+              📂 Load file
+            </button>
+            <button className="btn danger" onClick={() => unloadDump()} title="Clear current save data from view">
+              ✕ Clear
+            </button>
+          </>
+        )}
+      </div>
     </header>
   );
 }
