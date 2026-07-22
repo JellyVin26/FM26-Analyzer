@@ -17,7 +17,7 @@ export default defineConfig({
       configureServer(server) {
         server.middlewares.use('/api/dump', (_req, res) => {
           const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
-          const analyzerDir = path.join(localAppData, 'FMSuperScout');
+          const analyzerDir = path.join(localAppData, 'FMAnalyzer');
           const dumpPath = path.join(analyzerDir, 'data.json');
 
           if (fs.existsSync(dumpPath)) {
@@ -37,8 +37,7 @@ export default defineConfig({
         server.middlewares.use('/api/sync', async (_req, res) => {
           try {
             const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
-            // Using FMSuperScout path here so we can seamlessly use the pre-compiled DLL!
-            const analyzerDir = path.join(localAppData, 'FMSuperScout');
+            const analyzerDir = path.join(localAppData, 'FMAnalyzer');
             const dumpPath = path.join(analyzerDir, 'data.json');
             const flagPath = path.join(analyzerDir, 'request.flag');
             
