@@ -11,7 +11,7 @@ import { BuySellLoanAdvisor } from "./components/BuySellLoanAdvisor";
 import { useLoadDump } from "./hooks/useLoadDump";
 
 function TopBar() {
-  const { dump, activeTab, setActiveTab, comparedIds, unloadDump, setLoading } = useApp();
+  const { dump, activeTab, setActiveTab, comparedIds, unloadDump } = useApp();
   const { loadFile, syncLiveSave } = useLoadDump();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -60,7 +60,7 @@ function TopBar() {
 
       {dump && (
         <span className="topbar-meta" style={{ marginRight: 12 }}>
-          <strong>{dump.meta.myClub || "Active Save"}</strong> {dump.meta.gameVersion ? `(FM v${dump.meta.gameVersion})` : ""} · {dump.players.length.toLocaleString()} players loaded
+          <strong>{dump.meta.myClub || (dump.meta.manager ? `Manager: ${dump.meta.manager.replace(/[()]/g, '')}` : "Active Save")}</strong> {dump.meta.gameVersion ? `(FM v${dump.meta.gameVersion})` : ""} · {dump.players.length.toLocaleString()} players loaded
         </span>
       )}
 
