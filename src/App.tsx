@@ -74,7 +74,7 @@ function TopBar() {
 
       <div style={{ display: "flex", gap: 8 }}>
         <a 
-          href="https://ko-fi.com/fmanalyzer" 
+          href="https://ko-fi.com/jellyvin" 
           target="_blank" 
           rel="noopener noreferrer" 
           className="btn" 
