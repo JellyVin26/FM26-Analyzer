@@ -2,7 +2,6 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
-const open = require('open');
 
 const app = express();
 const PORT = 5173;
@@ -79,7 +78,7 @@ app.get('/api/sync', async (req, res) => {
 });
 
 // Fallback to index.html for single-page app routing
-app.get('*', (req, res) => {
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
@@ -89,6 +88,7 @@ app.listen(PORT, '0.0.0.0', async () => {
   console.log(`Opening browser automatically...`);
   
   try {
+    const { default: open } = await import('open');
     await open(`http://localhost:${PORT}`);
   } catch (err) {
     console.error("Failed to automatically open browser. Please navigate to http://localhost:5173");
