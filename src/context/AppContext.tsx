@@ -20,6 +20,7 @@ interface Filters {
   paMax: string;
   valueMax: string;
   contractExpiry: string;
+  transferStatus: string;
 }
 
 export type TabView = "scout" | "compare" | "gaps" | "advisor" | "squad" | "shortlist";
@@ -56,7 +57,7 @@ interface AppState {
 const DEFAULT_FILTERS: Filters = {
   search: "", pos: "", ipRole: "", minIpScore: "", oopRole: "", minOopScore: "", club: "", nationality: "",
   ageMin: "", ageMax: "", caMin: "", caMax: "",
-  paMin: "", paMax: "", valueMax: "", contractExpiry: "",
+  paMin: "", paMax: "", valueMax: "", contractExpiry: "", transferStatus: "",
 };
 
 const Ctx = createContext<AppState>(null!);
@@ -156,6 +157,41 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (filters.paMin)  list = list.filter((p) => p.pa  >= +filters.paMin);
     if (filters.paMax)  list = list.filter((p) => p.pa  <= +filters.paMax);
     if (filters.valueMax) list = list.filter((p) => p.value <= +filters.valueMax);
+
+    if (filters.transferStatus) {
+      const ts = filters.transferStatus;
+      const gameDateStr = dump.meta?.gameDate || "";
+      const gameDate = gameDateStr ? new Date(gameDateStr) : new Date();
+
+      if (ts === "transfer-listed") {
+        list = list.filter((p) => p.listed);
+      } else if (ts === "loan-listed") {
+        list = list.filter((p) => p.loanListed);
+      } else if (ts === "free-agent") {
+        list = list.filter((p) => !p.club);
+      } else if (ts === "expiring-6m" || ts === "expiring-1y") {
+        const limitMonths = ts === "expiring-6m" ? 6 : 12;
+        const limitDate = new Date(gameDate);
+        limitDate.setMonth(limitDate.getMonth() + limitMonths);
+        
+        list = list.filter((p) => {
+          if (!p.expires) return false;
+          const expDate = new Date(p.expires);
+          return expDate <= limitDate && expDate >= gameDate;
+        });
+      } else if (ts === "realistic") {
+        // Find my club's rep
+        const myClubPlayers = dump.players.filter(p => p.club === dump.meta.myClub);
+        const myRep = myClubPlayers.length > 0 ? myClubPlayers[0].clubRep : 5000; // fallback
+        
+        list = list.filter((p) => {
+          if (!p.club) return true; // Free agents will join
+          if (p.listed) return true; // Transfer listed will join
+          if (p.clubRep <= myRep + 500) return true; // Similar or lower rep club will join
+          return false;
+        });
+      }
+    }
 
     if (sortKey === "role_ip") {
       list = list

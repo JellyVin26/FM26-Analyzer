@@ -129,6 +129,24 @@ export function Sidebar() {
         </select>
       </div>
 
+      {/* Contract & Transfer Status */}
+      <div className="filter-section">
+        <div className="filter-label">Contract & Transfer Status</div>
+        <select
+          className="filter-select"
+          value={filters.transferStatus}
+          onChange={(e) => setFilter("transferStatus", e.target.value)}
+        >
+          <option value="">Any status</option>
+          <option value="transfer-listed">Transfer Listed</option>
+          <option value="loan-listed">Loan Listed</option>
+          <option value="expiring-6m">Expiring (6 Months)</option>
+          <option value="expiring-1y">Expiring (1 Year)</option>
+          <option value="free-agent">Free Agents</option>
+          <option value="realistic">Realistic Targets (Likely to Join)</option>
+        </select>
+      </div>
+
       <div className="divider" />
 
       {/* Age */}

@@ -48,6 +48,7 @@ export interface Player {
   askingPrice: number;
   wageDemand: number | null;
   listed: boolean;
+  loanListed: boolean;
   notForSale: boolean;
   setForRelease: boolean;
   clubRep: number;
