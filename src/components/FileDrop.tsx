@@ -19,12 +19,11 @@ export function FileDrop() {
     <div className="empty-state" style={{ maxWidth: 500 }}>
       <div className="empty-state-icon">⚽</div>
       <div className="empty-state-title">FM Analyzer</div>
-      <div className="empty-state-sub">
-        Auto-detecting your live Football Manager 2026 save...<br />
-        <code style={{ fontSize: 11, opacity: 0.7 }}>%LOCALAPPDATA%\FMSuperScout\dump.json</code>
+      <div className="empty-state-sub" style={{ marginTop: 8, lineHeight: 1.5 }}>
+        Connect directly to Football Manager 2026 to extract live scouting data, or load a previous save file manually.
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%", maxWidth: 340, marginTop: 16 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%", maxWidth: 340, marginTop: 24 }}>
         <button
           className="btn primary"
           style={{ padding: "12px 24px", fontSize: 14, borderRadius: 10, justifyContent: "center" }}
