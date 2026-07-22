@@ -30,7 +30,9 @@ export function useLoadDump() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/dump");
+      const res = await fetch(`/api/dump?t=${Date.now()}`, {
+        cache: "no-store"
+      });
       if (!res.ok) {
         throw new Error("No local FM26 dump found at AppData/Local/FMSuperScout/dump.json");
       }
