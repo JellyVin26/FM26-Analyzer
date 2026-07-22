@@ -771,6 +771,27 @@ tbody tr.selected { background: var(--accent-glow); }
   font-family: var(--font-mono);
 }
 
+.squad-pos-filter {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 16px;
+  padding: 4px;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  width: fit-content;
+}
+
+.squad-pos-count {
+  margin-left: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  padding-right: 6px;
+}
+
 .squad-grid-title {
   font-size: 18px;
   font-weight: 700;
