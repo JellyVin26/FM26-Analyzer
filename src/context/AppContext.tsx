@@ -22,7 +22,7 @@ interface Filters {
   contractExpiry: string;
 }
 
-export type TabView = "scout" | "compare" | "gaps" | "advisor";
+export type TabView = "scout" | "compare" | "gaps" | "advisor" | "squad" | "shortlist";
 
 interface AppState {
   dump: Dump | null;
@@ -34,6 +34,7 @@ interface AppState {
   selectedId: number | null;
   activeTab: TabView;
   comparedIds: number[];
+  shortlistIds: number[];
   setDump: (d: Dump) => void;
   setLoading: (v: boolean) => void;
   setHiddenMode: (v: boolean) => void;
@@ -45,6 +46,9 @@ interface AppState {
   addComparePlayer: (id: number, navigate?: boolean) => void;
   removeComparePlayer: (id: number) => void;
   clearComparePlayers: () => void;
+  addToShortlist: (id: number) => void;
+  removeFromShortlist: (id: number) => void;
+  clearShortlist: () => void;
   unloadDump: () => void;
   filteredPlayers: Player[];
 }
@@ -67,6 +71,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<TabView>("scout");
   const [comparedIds, setComparedIds] = useState<number[]>([]);
+  const [shortlistIds, setShortlistIds] = useState<number[]>([]);
 
   const setDump = useCallback((d: Dump) => { setDump_(d); }, []);
   const unloadDump = useCallback(() => { setDump_(null); }, []);
@@ -90,6 +95,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const clearComparePlayers = useCallback(() => {
     setComparedIds([]);
+  }, []);
+
+  const addToShortlist = useCallback((id: number) => {
+    setShortlistIds((prev) => prev.includes(id) ? prev : [...prev, id]);
+  }, []);
+
+  const removeFromShortlist = useCallback((id: number) => {
+    setShortlistIds((prev) => prev.filter((i) => i !== id));
+  }, []);
+
+  const clearShortlist = useCallback(() => {
+    setShortlistIds([]);
   }, []);
 
   const setSort = useCallback((k: AppState["sortKey"]) => {
@@ -178,9 +195,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <Ctx.Provider value={{
       dump, loading, hiddenMode, filters, sortKey, sortDir, selectedId,
-      activeTab, comparedIds,
+      activeTab, comparedIds, shortlistIds,
       setDump, unloadDump, setLoading, setHiddenMode, setFilter, resetFilters, setSort,
       setSelectedId, setActiveTab, addComparePlayer, removeComparePlayer, clearComparePlayers,
+      addToShortlist, removeFromShortlist, clearShortlist,
       filteredPlayers,
     }}>
       {children}

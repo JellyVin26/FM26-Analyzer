@@ -7,11 +7,13 @@ import { PlayerDrawer } from "./components/PlayerDrawer";
 import { FileDrop } from "./components/FileDrop";
 import { PlayerComparison } from "./components/PlayerComparison";
 import { SquadGapAnalysis } from "./components/SquadGapAnalysis";
+import { SquadOverview } from "./components/SquadOverview";
 import { BuySellLoanAdvisor } from "./components/BuySellLoanAdvisor";
+import { ShortlistBuilder } from "./components/ShortlistBuilder";
 import { useLoadDump } from "./hooks/useLoadDump";
 
 function TopBar() {
-  const { dump, activeTab, setActiveTab, comparedIds, unloadDump } = useApp();
+  const { dump, activeTab, setActiveTab, comparedIds, shortlistIds, unloadDump } = useApp();
   const { loadFile, syncLiveSave } = useLoadDump();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -48,10 +50,22 @@ function TopBar() {
             🛡️ Squad Gaps
           </button>
           <button
+            className={`btn ${activeTab === "squad" ? "primary" : ""}`}
+            onClick={() => setActiveTab("squad")}
+          >
+            🏟️ Squad Overview
+          </button>
+          <button
             className={`btn ${activeTab === "advisor" ? "primary" : ""}`}
             onClick={() => setActiveTab("advisor")}
           >
             💡 Recruitment Advisor
+          </button>
+          <button
+            className={`btn ${activeTab === "shortlist" ? "primary" : ""}`}
+            onClick={() => setActiveTab("shortlist")}
+          >
+            ⭐ Shortlist {shortlistIds.length > 0 ? `(${shortlistIds.length})` : "(0)"}
           </button>
         </nav>
       )}
@@ -121,6 +135,10 @@ export function App() {
             <PlayerComparison />
           ) : activeTab === "gaps" ? (
             <SquadGapAnalysis />
+          ) : activeTab === "squad" ? (
+            <SquadOverview />
+          ) : activeTab === "shortlist" ? (
+            <ShortlistBuilder />
           ) : (
             <BuySellLoanAdvisor />
           )
