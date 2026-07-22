@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { useApp } from "../context/AppContext";
 import type { Player } from "../data/types";
-import { scorePlayer } from "../engine/ratingEngine";
+import { scorePlayer, scoreSingleRole } from "../engine/ratingEngine";
+import { ROLE_BY_ID } from "../data/roleDefinitions";
 
 const PAGE_SIZE = 50;
 
@@ -33,8 +34,10 @@ interface Row {
 }
 
 export function PlayerTable() {
-  const { filteredPlayers, setSelectedId, selectedId, sortKey, sortDir, setSort, hiddenMode } = useApp();
+  const { filteredPlayers, setSelectedId, selectedId, sortKey, sortDir, setSort, hiddenMode, filters } = useApp();
   const [page, setPage] = useState(0);
+
+  const selectedRoleName = filters.role ? ROLE_BY_ID[filters.role]?.name || filters.role : null;
 
   // Reset to page 0 when filters change
   const totalPages = Math.ceil(filteredPlayers.length / PAGE_SIZE);
@@ -45,6 +48,16 @@ export function PlayerTable() {
 
   const rows: Row[] = useMemo(() => {
     return pageSlice.map((p) => {
+      if (filters.role) {
+        const sr = scoreSingleRole(p, filters.role);
+        return {
+          player: p,
+          topIpScore:    sr?.ipScore   ?? 0,
+          topIpRoleName: sr?.roleName  ?? selectedRoleName ?? "—",
+          topOopScore:   sr?.oopScore  ?? 0,
+          topOopRoleName: sr?.roleName ?? selectedRoleName ?? "—",
+        };
+      }
       const scores = scorePlayer(p);
       const topIP  = scores[0];
       const topOOP = [...scores].sort((a, b) => b.oopScore - a.oopScore)[0];
@@ -57,7 +70,7 @@ export function PlayerTable() {
       };
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [safeePage, filteredPlayers]);
+  }, [safeePage, filteredPlayers, filters.role]);
 
   const Th = ({ label, k }: { label: string; k: typeof sortKey }) => (
     <th onClick={() => { setPage(0); setSort(k); }} className={sortKey === k ? "sorted" : ""}>
@@ -113,7 +126,7 @@ export function PlayerTable() {
                 {!hiddenMode && <Th label="CA" k="ca" />}
                 {!hiddenMode && <Th label="PA" k="pa" />}
                 <Th label="Value" k="value" />
-                <th>Best IP Role</th>
+                <th>{selectedRoleName ? `Role: ${selectedRoleName}` : "Best IP Role"}</th>
                 <th>IP</th>
                 <th>OOP</th>
                 <th>Expires</th>

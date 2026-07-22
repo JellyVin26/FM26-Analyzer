@@ -1,12 +1,12 @@
 import { useApp } from "../context/AppContext";
+import { getRolesForPosition } from "../data/roleDefinitions";
 
 const POSITIONS = ["GK", "DC", "DR", "DL", "WBR", "WBL", "DM", "MC", "AML", "AMR", "AMC", "ML", "MR", "ST"];
 
-
-
-
 export function Sidebar() {
   const { filters, setFilter, resetFilters, hiddenMode, setHiddenMode, dump } = useApp();
+
+  const availableRoles = getRolesForPosition(filters.pos).sort((a, b) => a.name.localeCompare(b.name));
 
   const clubs = dump
     ? [...new Set(dump.players.map((p) => p.club))].sort()
@@ -35,12 +35,44 @@ export function Sidebar() {
         <select
           className="filter-select"
           value={filters.pos}
-          onChange={(e) => setFilter("pos", e.target.value)}
+          onChange={(e) => {
+            setFilter("pos", e.target.value);
+            setFilter("role", ""); // reset role selection when position changes
+          }}
         >
           <option value="">All positions</option>
           {POSITIONS.map((p) => <option key={p} value={p}>{p}</option>)}
         </select>
       </div>
+
+      {/* Role */}
+      <div className="filter-section">
+        <div className="filter-label">Tactical Role</div>
+        <select
+          className="filter-select"
+          value={filters.role}
+          onChange={(e) => setFilter("role", e.target.value)}
+        >
+          <option value="">All roles</option>
+          {availableRoles.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+        </select>
+      </div>
+
+      {/* Min Role Rating */}
+      {filters.role && (
+        <div className="filter-section">
+          <div className="filter-label">Min Role Rating (%)</div>
+          <input
+            className="range-input"
+            type="number"
+            min={0}
+            max={100}
+            placeholder="Min score (e.g. 70)"
+            value={filters.minRoleScore}
+            onChange={(e) => setFilter("minRoleScore", e.target.value)}
+          />
+        </div>
+      )}
 
       {/* Club */}
       <div className="filter-section">

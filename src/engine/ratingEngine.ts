@@ -1,8 +1,4 @@
-// FM26 Role Rating Engine
-// Formula: key × 2, preferred × 1 — normalized to 0–100
-// Each player gets independent IP and OOP scores per role.
-
-import { ALL_ROLES, type Attribute } from "../data/roleDefinitions";
+import { ALL_ROLES, ROLE_BY_ID, type Attribute } from "../data/roleDefinitions";
 import type { Player, PlayerAttrs, RoleScore } from "../data/types";
 
 function getAttr(attrs: PlayerAttrs, name: Attribute): number {
@@ -40,6 +36,15 @@ export function scorePlayer(player: Player): RoleScore[] {
   }
 
   return results.sort((a, b) => b.ipScore - a.ipScore);
+}
+
+/** Score a single player against a specific role. */
+export function scoreSingleRole(player: Player, roleId: string): RoleScore | null {
+  const role = ROLE_BY_ID[roleId] || ALL_ROLES.find((r) => r.id === roleId || r.name === roleId);
+  if (!role) return null;
+  const ipScore  = scoreWeights(player.attrs, role.ip.key,  role.ip.preferred);
+  const oopScore = scoreWeights(player.attrs, role.oop.key, role.oop.preferred);
+  return { roleId: role.id, roleName: role.name, ipScore, oopScore };
 }
 
 /** Score a single player against all roles (for the comparison view). */

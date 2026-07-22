@@ -4,6 +4,8 @@ import type { Dump, Player } from "../data/types";
 interface Filters {
   search: string;
   pos: string;
+  role: string;
+  minRoleScore: string;
   club: string;
   nationality: string;
   ageMin: string;
@@ -21,7 +23,7 @@ interface AppState {
   loading: boolean;
   hiddenMode: boolean;     // hide CA/PA/hidden attrs
   filters: Filters;
-  sortKey: keyof Player | "value";
+  sortKey: keyof Player | "value" | "role_ip" | "role_oop";
   sortDir: "asc" | "desc";
   selectedId: number | null;
   setDump: (d: Dump) => void;
@@ -35,7 +37,7 @@ interface AppState {
 }
 
 const DEFAULT_FILTERS: Filters = {
-  search: "", pos: "", club: "", nationality: "",
+  search: "", pos: "", role: "", minRoleScore: "", club: "", nationality: "",
   ageMin: "", ageMax: "", caMin: "", caMax: "",
   paMin: "", paMax: "", valueMax: "", contractExpiry: "",
 };

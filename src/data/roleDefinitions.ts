@@ -639,3 +639,11 @@ export const ALL_ROLES: Role[] = [
 ];
 
 export const ROLE_BY_ID = Object.fromEntries(ALL_ROLES.map((r) => [r.id, r]));
+
+export function getRolesForPosition(pos?: string): Role[] {
+  if (!pos) return ALL_ROLES;
+  const clean = pos.trim().toUpperCase();
+  return ALL_ROLES.filter((role) =>
+    role.positions.some((rp) => rp === clean || clean.startsWith(rp) || rp.startsWith(clean))
+  );
+}
