@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useApp } from "../context/AppContext";
 import type { Player } from "../data/types";
-import { scorePlayer, scoreSingleRole } from "../engine/ratingEngine";
+import { scoreSingleRole, topIpRoles, topOopRoles } from "../engine/ratingEngine";
 import { ROLE_BY_ID } from "../data/roleDefinitions";
 
 const PAGE_SIZE = 50;
@@ -37,7 +37,8 @@ export function PlayerTable() {
   const { filteredPlayers, setSelectedId, selectedId, sortKey, sortDir, setSort, hiddenMode, filters } = useApp();
   const [page, setPage] = useState(0);
 
-  const selectedRoleName = filters.role ? ROLE_BY_ID[filters.role]?.name || filters.role : null;
+  const ipRoleName = filters.ipRole ? ROLE_BY_ID[filters.ipRole]?.name || filters.ipRole : null;
+  const oopRoleName = filters.oopRole ? ROLE_BY_ID[filters.oopRole]?.name || filters.oopRole : null;
 
   // Reset to page 0 when filters change
   const totalPages = Math.ceil(filteredPlayers.length / PAGE_SIZE);
@@ -48,29 +49,40 @@ export function PlayerTable() {
 
   const rows: Row[] = useMemo(() => {
     return pageSlice.map((p) => {
-      if (filters.role) {
-        const sr = scoreSingleRole(p, filters.role);
-        return {
-          player: p,
-          topIpScore:    sr?.ipScore   ?? 0,
-          topIpRoleName: sr?.roleName  ?? selectedRoleName ?? "—",
-          topOopScore:   sr?.oopScore  ?? 0,
-          topOopRoleName: sr?.roleName ?? selectedRoleName ?? "—",
-        };
+      let ipScore = 0;
+      let ipName = "—";
+      if (filters.ipRole) {
+        const sr = scoreSingleRole(p, filters.ipRole);
+        ipScore = sr?.ipScore ?? 0;
+        ipName = sr?.roleName ?? ipRoleName ?? "—";
+      } else {
+        const topIP = topIpRoles(p, 1)[0];
+        ipScore = topIP?.ipScore ?? 0;
+        ipName = topIP?.roleName ?? "—";
       }
-      const scores = scorePlayer(p);
-      const topIP  = scores[0];
-      const topOOP = [...scores].sort((a, b) => b.oopScore - a.oopScore)[0];
+
+      let oopScore = 0;
+      let oopName = "—";
+      if (filters.oopRole) {
+        const sr = scoreSingleRole(p, filters.oopRole);
+        oopScore = sr?.oopScore ?? 0;
+        oopName = sr?.roleName ?? oopRoleName ?? "—";
+      } else {
+        const topOOP = topOopRoles(p, 1)[0];
+        oopScore = topOOP?.oopScore ?? 0;
+        oopName = topOOP?.roleName ?? "—";
+      }
+
       return {
         player: p,
-        topIpScore:    topIP?.ipScore   ?? 0,
-        topIpRoleName: topIP?.roleName  ?? "—",
-        topOopScore:   topOOP?.oopScore ?? 0,
-        topOopRoleName: topOOP?.roleName ?? "—",
+        topIpScore: ipScore,
+        topIpRoleName: ipName,
+        topOopScore: oopScore,
+        topOopRoleName: oopName,
       };
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [safeePage, filteredPlayers, filters.role]);
+  }, [safeePage, filteredPlayers, filters.ipRole, filters.oopRole]);
 
   const Th = ({ label, k }: { label: string; k: typeof sortKey }) => (
     <th onClick={() => { setPage(0); setSort(k); }} className={sortKey === k ? "sorted" : ""}>
@@ -126,7 +138,7 @@ export function PlayerTable() {
                 {!hiddenMode && <Th label="CA" k="ca" />}
                 {!hiddenMode && <Th label="PA" k="pa" />}
                 <Th label="Value" k="value" />
-                <th>{selectedRoleName ? `Role: ${selectedRoleName}` : "Best IP Role"}</th>
+                <th>{ipRoleName ? `IP Role: ${ipRoleName}` : "Best IP Role"}</th>
                 <th>IP</th>
                 <th>OOP</th>
                 <th>Expires</th>

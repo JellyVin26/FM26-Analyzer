@@ -1,11 +1,14 @@
 import React, { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 import type { Dump, Player } from "../data/types";
+import { scoreSingleRole } from "../engine/ratingEngine";
 
 interface Filters {
   search: string;
   pos: string;
-  role: string;
-  minRoleScore: string;
+  ipRole: string;
+  minIpScore: string;
+  oopRole: string;
+  minOopScore: string;
   club: string;
   nationality: string;
   ageMin: string;
@@ -37,7 +40,7 @@ interface AppState {
 }
 
 const DEFAULT_FILTERS: Filters = {
-  search: "", pos: "", role: "", minRoleScore: "", club: "", nationality: "",
+  search: "", pos: "", ipRole: "", minIpScore: "", oopRole: "", minOopScore: "", club: "", nationality: "",
   ageMin: "", ageMax: "", caMin: "", caMax: "",
   paMin: "", paMax: "", valueMax: "", contractExpiry: "",
 };
@@ -83,6 +86,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     if (filters.club) list = list.filter((p) => p.club === filters.club);
     if (filters.nationality) list = list.filter((p) => p.nat && Array.isArray(p.nat) && p.nat.includes(filters.nationality));
+    if (filters.ipRole) {
+      const roleId = filters.ipRole;
+      const minScore = filters.minIpScore ? +filters.minIpScore : 0;
+      list = list.filter((p) => {
+        const sr = scoreSingleRole(p, roleId);
+        return sr ? sr.ipScore >= minScore : false;
+      });
+    }
+    if (filters.oopRole) {
+      const roleId = filters.oopRole;
+      const minScore = filters.minOopScore ? +filters.minOopScore : 0;
+      list = list.filter((p) => {
+        const sr = scoreSingleRole(p, roleId);
+        return sr ? sr.oopScore >= minScore : false;
+      });
+    }
     if (filters.ageMin) list = list.filter((p) => p.age >= +filters.ageMin);
     if (filters.ageMax) list = list.filter((p) => p.age <= +filters.ageMax);
     if (filters.caMin)  list = list.filter((p) => p.ca  >= +filters.caMin);

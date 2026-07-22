@@ -6,7 +6,8 @@ const POSITIONS = ["GK", "DC", "DR", "DL", "WBR", "WBL", "DM", "MC", "AML", "AMR
 export function Sidebar() {
   const { filters, setFilter, resetFilters, hiddenMode, setHiddenMode, dump } = useApp();
 
-  const availableRoles = getRolesForPosition(filters.pos).sort((a, b) => a.name.localeCompare(b.name));
+  const availableIpRoles = getRolesForPosition(filters.pos, "IP").sort((a, b) => a.name.localeCompare(b.name));
+  const availableOopRoles = getRolesForPosition(filters.pos, "OOP").sort((a, b) => a.name.localeCompare(b.name));
 
   const clubs = dump
     ? [...new Set(dump.players.map((p) => p.club))].sort()
@@ -37,7 +38,8 @@ export function Sidebar() {
           value={filters.pos}
           onChange={(e) => {
             setFilter("pos", e.target.value);
-            setFilter("role", ""); // reset role selection when position changes
+            setFilter("ipRole", "");
+            setFilter("oopRole", "");
           }}
         >
           <option value="">All positions</option>
@@ -45,31 +47,58 @@ export function Sidebar() {
         </select>
       </div>
 
-      {/* Role */}
+      {/* In-Possession (IP) Role */}
       <div className="filter-section">
-        <div className="filter-label">Tactical Role</div>
+        <div className="filter-label">In-Possession Role (IP)</div>
         <select
           className="filter-select"
-          value={filters.role}
-          onChange={(e) => setFilter("role", e.target.value)}
+          value={filters.ipRole}
+          onChange={(e) => setFilter("ipRole", e.target.value)}
         >
-          <option value="">All roles</option>
-          {availableRoles.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+          <option value="">All IP roles</option>
+          {availableIpRoles.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
         </select>
       </div>
 
-      {/* Min Role Rating */}
-      {filters.role && (
+      {filters.ipRole && (
         <div className="filter-section">
-          <div className="filter-label">Min Role Rating (%)</div>
+          <div className="filter-label">Min IP Rating (%)</div>
           <input
             className="range-input"
             type="number"
             min={0}
             max={100}
-            placeholder="Min score (e.g. 70)"
-            value={filters.minRoleScore}
-            onChange={(e) => setFilter("minRoleScore", e.target.value)}
+            placeholder="Min IP score (e.g. 70)"
+            value={filters.minIpScore}
+            onChange={(e) => setFilter("minIpScore", e.target.value)}
+          />
+        </div>
+      )}
+
+      {/* Out-of-Possession (OOP) Role */}
+      <div className="filter-section">
+        <div className="filter-label">Out-of-Possession Role (OOP)</div>
+        <select
+          className="filter-select"
+          value={filters.oopRole}
+          onChange={(e) => setFilter("oopRole", e.target.value)}
+        >
+          <option value="">All OOP roles</option>
+          {availableOopRoles.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+        </select>
+      </div>
+
+      {filters.oopRole && (
+        <div className="filter-section">
+          <div className="filter-label">Min OOP Rating (%)</div>
+          <input
+            className="range-input"
+            type="number"
+            min={0}
+            max={100}
+            placeholder="Min OOP score (e.g. 70)"
+            value={filters.minOopScore}
+            onChange={(e) => setFilter("minOopScore", e.target.value)}
           />
         </div>
       )}
