@@ -12,7 +12,7 @@ import { useLoadDump } from "./hooks/useLoadDump";
 
 function TopBar() {
   const { dump, activeTab, setActiveTab, comparedIds } = useApp();
-  const { loadFile } = useLoadDump();
+  const { loadFile, loadFromAutoDump } = useLoadDump();
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -69,9 +69,14 @@ function TopBar() {
       />
 
       {dump && (
-        <button className="btn" onClick={() => inputRef.current?.click()}>
-          📂 Load dump
-        </button>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button className="btn primary" onClick={() => loadFromAutoDump()} title="Sync updated save state from FM26">
+            ⚡ Sync Live Save
+          </button>
+          <button className="btn" onClick={() => inputRef.current?.click()}>
+            📂 Load file
+          </button>
+        </div>
       )}
     </header>
   );
