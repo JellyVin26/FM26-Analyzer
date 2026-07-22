@@ -1,7 +1,6 @@
 // FM26 Role Definitions
-// Source: FM26 in-game UI role attribute highlights (key=green, preferred=blue)
-// Formula: key × 2, preferred × 1 — averaged over total weight sum → 0–100 score
-// IP and OOP roles are scored independently per player.
+// Extracted from FM26 engine metadata & tactical system:
+// Tactics are split into In-Possession (IP) and Out-of-Possession (OOP) phases.
 
 export type Attribute =
   | "Acceleration" | "Agility" | "Balance" | "JumpingReach" | "NaturalFitness"
@@ -16,634 +15,563 @@ export type Attribute =
   | "Eccentricity" | "Kicking" | "OneOnOnes" | "Reflexes" | "RushingOut"
   | "Throwing" | "Punching";
 
-export type Phase = "IP" | "OOP";
-
-export interface RoleWeights {
-  key: Attribute[];       // green in UI — weight 2
-  preferred: Attribute[]; // blue in UI  — weight 1
-}
+export type RolePhase = "IP" | "OOP";
 
 export interface Role {
   id: string;
   name: string;
-  positions: string[];   // posArr values this role applies to
-  ip: RoleWeights;
-  oop: RoleWeights;
+  phase: RolePhase;
+  positions: string[]; // e.g. ["GK"], ["DC"], ["DR", "DL"], ["DM", "MC"], ["AML", "AMR"], ["ST"]
+  key: Attribute[];       // Weight 2
+  preferred: Attribute[]; // Weight 1
 }
 
 // ─────────────────────────────────────────────────────────────
-// GOALKEEPERS
+// IN-POSSESSION (IP) ROLES — FM26
 // ─────────────────────────────────────────────────────────────
-const GK_ROLES: Role[] = [
+export const IP_ROLES: Role[] = [
+  // GOALKEEPERS
   {
-    id: "sweeper_keeper_ip",
-    name: "Sweeper Keeper",
-    positions: ["GK"],
-    ip: {
-      key:       ["Kicking", "Reflexes", "Composure", "Decisions"],
-      preferred: ["Handling", "Communication", "FirstTouch", "Passing", "Anticipation"],
-    },
-    oop: {
-      key:       ["AerialReach", "CommandOfArea", "Positioning", "RushingOut"],
-      preferred: ["Anticipation", "Concentration", "Reflexes", "Bravery", "OneOnOnes"],
-    },
-  },
-  {
-    id: "distribution_goalkeeper",
+    id: "ip_distribution_keeper",
     name: "Distribution Goalkeeper",
+    phase: "IP",
     positions: ["GK"],
-    ip: {
-      key:       ["Kicking", "Throwing", "Passing", "Communication"],
-      preferred: ["Handling", "FirstTouch", "Composure", "Decisions", "Vision"],
-    },
-    oop: {
-      key:       ["Reflexes", "Handling", "OneOnOnes", "Positioning"],
-      preferred: ["AerialReach", "CommandOfArea", "Concentration", "Anticipation"],
-    },
+    key: ["Kicking", "Throwing", "Passing", "Communication"],
+    preferred: ["Handling", "FirstTouch", "Composure", "Decisions", "Vision"],
   },
   {
-    id: "line_holding_goalkeeper",
-    name: "Line-Holding Goalkeeper",
+    id: "ip_sweeper_keeper",
+    name: "Sweeper Keeper",
+    phase: "IP",
     positions: ["GK"],
-    ip: {
-      key:       ["Handling", "Kicking", "Communication"],
-      preferred: ["Composure", "Decisions", "Reflexes", "Throwing"],
-    },
-    oop: {
-      key:       ["Reflexes", "OneOnOnes", "Positioning", "Concentration"],
-      preferred: ["AerialReach", "CommandOfArea", "Anticipation", "Bravery"],
-    },
+    key: ["Kicking", "Passing", "FirstTouch", "Composure", "Decisions"],
+    preferred: ["Handling", "Vision", "Throwing", "Anticipation", "Agility"],
   },
-];
 
-// ─────────────────────────────────────────────────────────────
-// CENTRAL DEFENDERS
-// ─────────────────────────────────────────────────────────────
-const CB_ROLES: Role[] = [
+  // CENTRAL DEFENDERS
   {
-    id: "ball_playing_defender",
+    id: "ip_central_defender",
+    name: "Central Defender (Build-Up)",
+    phase: "IP",
+    positions: ["DC"],
+    key: ["Passing", "FirstTouch", "Composure", "Decisions"],
+    preferred: ["Positioning", "Technique", "Vision", "Heading"],
+  },
+  {
+    id: "ip_ball_playing_defender",
     name: "Ball-Playing Defender",
-    positions: ["DC", "DCR", "DCL"],
-    ip: {
-      key:       ["Passing", "FirstTouch", "Composure", "Technique"],
-      preferred: ["Vision", "Decisions", "Dribbling", "Marking", "Anticipation"],
-    },
-    oop: {
-      key:       ["Marking", "Tackling", "Positioning", "Concentration"],
-      preferred: ["Heading", "Strength", "Anticipation", "JumpingReach", "Bravery"],
-    },
+    phase: "IP",
+    positions: ["DC"],
+    key: ["Passing", "FirstTouch", "Composure", "Technique", "Vision"],
+    preferred: ["Decisions", "Dribbling", "Anticipation", "Positioning"],
   },
   {
-    id: "libero",
+    id: "ip_wide_centreback",
+    name: "Wide Centre-Back",
+    phase: "IP",
+    positions: ["DC"],
+    key: ["Crossing", "Dribbling", "Passing", "Stamina", "Acceleration"],
+    preferred: ["Technique", "Agility", "FirstTouch", "Vision", "Composure"],
+  },
+  {
+    id: "ip_libero",
     name: "Libero",
-    positions: ["DC", "DCR", "DCL"],
-    ip: {
-      key:       ["Passing", "Dribbling", "Vision", "FirstTouch"],
-      preferred: ["Composure", "Decisions", "Technique", "Anticipation", "Flair"],
-    },
-    oop: {
-      key:       ["Marking", "Tackling", "Positioning", "Anticipation"],
-      preferred: ["Heading", "Concentration", "Strength", "Decisions", "Bravery"],
-    },
+    phase: "IP",
+    positions: ["DC"],
+    key: ["Passing", "Dribbling", "Vision", "FirstTouch", "Technique"],
+    preferred: ["Composure", "Decisions", "Flair", "Anticipation"],
   },
-  {
-    id: "wide_centreback_attack",
-    name: "Wide Centre-Back (Attacking)",
-    positions: ["DC", "DCR", "DCL"],
-    ip: {
-      key:       ["Crossing", "Dribbling", "Stamina", "Pace"],
-      preferred: ["Passing", "Technique", "Acceleration", "Agility", "FirstTouch"],
-    },
-    oop: {
-      key:       ["Marking", "Tackling", "Positioning", "Concentration"],
-      preferred: ["Heading", "Strength", "Anticipation", "JumpingReach"],
-    },
-  },
-  {
-    id: "stopping_centreback",
-    name: "Stopping Centre-Back",
-    positions: ["DC", "DCR", "DCL"],
-    ip: {
-      key:       ["Heading", "Marking", "Strength"],
-      preferred: ["Passing", "Tackling", "Bravery", "Composure", "Anticipation"],
-    },
-    oop: {
-      key:       ["Marking", "Tackling", "Heading", "Strength", "Positioning"],
-      preferred: ["Concentration", "JumpingReach", "Bravery", "Anticipation", "Aggression"],
-    },
-  },
-  {
-    id: "covering_centreback",
-    name: "Covering Centre-Back",
-    positions: ["DC", "DCR", "DCL"],
-    ip: {
-      key:       ["Anticipation", "Marking", "Positioning"],
-      preferred: ["Concentration", "Decisions", "Tackling", "Heading", "Composure"],
-    },
-    oop: {
-      key:       ["Anticipation", "Concentration", "Positioning", "Marking"],
-      preferred: ["Tackling", "Decisions", "Heading", "Pace", "Acceleration"],
-    },
-  },
-];
 
-// ─────────────────────────────────────────────────────────────
-// FULL-BACKS & WING-BACKS
-// ─────────────────────────────────────────────────────────────
-const FB_ROLES: Role[] = [
+  // FULL-BACKS & WING-BACKS
   {
-    id: "inverted_fullback",
+    id: "ip_fullback",
+    name: "Full-Back",
+    phase: "IP",
+    positions: ["DR", "DL"],
+    key: ["Passing", "Crossing", "FirstTouch", "Stamina"],
+    preferred: ["Composure", "Decisions", "Dribbling", "WorkRate"],
+  },
+  {
+    id: "ip_inverted_fullback",
     name: "Inverted Full-Back",
+    phase: "IP",
     positions: ["DR", "DL"],
-    ip: {
-      key:       ["Passing", "Technique", "FirstTouch", "Vision"],
-      preferred: ["Composure", "Decisions", "Dribbling", "Agility", "Anticipation"],
-    },
-    oop: {
-      key:       ["Marking", "Tackling", "Positioning", "Concentration"],
-      preferred: ["Anticipation", "Decisions", "Stamina", "Strength"],
-    },
+    key: ["Passing", "Technique", "FirstTouch", "Vision", "Composure"],
+    preferred: ["Decisions", "Positioning", "Anticipation", "Agility"],
   },
   {
-    id: "false_fullback",
-    name: "False Full-Back / Midfield Inverter",
-    positions: ["DR", "DL"],
-    ip: {
-      key:       ["Passing", "Vision", "Composure", "Positioning"],
-      preferred: ["FirstTouch", "Technique", "Decisions", "Anticipation", "Stamina"],
-    },
-    oop: {
-      key:       ["Marking", "Tackling", "Concentration", "Positioning"],
-      preferred: ["Anticipation", "WorkRate", "Stamina", "Decisions"],
-    },
-  },
-  {
-    id: "complete_wingback",
-    name: "Complete Wing-Back",
-    positions: ["DR", "DL", "WBR", "WBL"],
-    ip: {
-      key:       ["Crossing", "Stamina", "Acceleration", "Pace", "Dribbling"],
-      preferred: ["Passing", "Technique", "Agility", "Flair", "OffTheBall"],
-    },
-    oop: {
-      key:       ["Stamina", "WorkRate", "Marking", "Tackling"],
-      preferred: ["Positioning", "Concentration", "Anticipation", "Pace"],
-    },
-  },
-  {
-    id: "wingback",
+    id: "ip_wingback",
     name: "Wing-Back",
+    phase: "IP",
     positions: ["DR", "DL", "WBR", "WBL"],
-    ip: {
-      key:       ["Crossing", "Stamina", "Pace", "Acceleration"],
-      preferred: ["Passing", "Dribbling", "Agility", "WorkRate", "Technique"],
-    },
-    oop: {
-      key:       ["Stamina", "WorkRate", "Tackling", "Positioning"],
-      preferred: ["Marking", "Concentration", "Anticipation", "Pace"],
-    },
+    key: ["Crossing", "Stamina", "Acceleration", "Pace", "Dribbling"],
+    preferred: ["Passing", "Technique", "Agility", "WorkRate", "OffTheBall"],
   },
   {
-    id: "pressing_fullback",
-    name: "Pressing Full-Back",
-    positions: ["DR", "DL"],
-    ip: {
-      key:       ["Crossing", "Stamina", "WorkRate"],
-      preferred: ["Pace", "Passing", "Tackling", "Marking", "Acceleration"],
-    },
-    oop: {
-      key:       ["WorkRate", "Stamina", "Tackling", "Marking", "Aggression"],
-      preferred: ["Positioning", "Concentration", "Anticipation", "Pace"],
-    },
+    id: "ip_inverted_wingback",
+    name: "Inverted Wing-Back",
+    phase: "IP",
+    positions: ["DR", "DL", "WBR", "WBL"],
+    key: ["Passing", "Vision", "Composure", "FirstTouch", "Technique"],
+    preferred: ["Dribbling", "Decisions", "Agility", "Stamina", "OffTheBall"],
   },
-  {
-    id: "holding_fullback",
-    name: "Holding Full-Back",
-    positions: ["DR", "DL"],
-    ip: {
-      key:       ["Marking", "Tackling", "Positioning"],
-      preferred: ["Concentration", "Anticipation", "Stamina", "Strength", "WorkRate"],
-    },
-    oop: {
-      key:       ["Marking", "Tackling", "Positioning", "Concentration"],
-      preferred: ["Anticipation", "Strength", "WorkRate", "Stamina", "Heading"],
-    },
-  },
-  {
-    id: "defensive_fullback",
-    name: "Defensive Full-Back",
-    positions: ["DR", "DL"],
-    ip: {
-      key:       ["Marking", "Tackling", "Positioning", "Concentration"],
-      preferred: ["Stamina", "Heading", "Strength", "WorkRate", "Anticipation"],
-    },
-    oop: {
-      key:       ["Marking", "Tackling", "Positioning", "Concentration", "Anticipation"],
-      preferred: ["Heading", "Strength", "WorkRate", "Stamina", "Bravery"],
-    },
-  },
-];
 
-// ─────────────────────────────────────────────────────────────
-// DEFENSIVE & CENTRAL MIDFIELDERS
-// ─────────────────────────────────────────────────────────────
-const DM_CM_ROLES: Role[] = [
+  // MIDFIELDERS
   {
-    id: "deep_lying_playmaker",
+    id: "ip_defensive_midfielder",
+    name: "Defensive Midfielder (Holding)",
+    phase: "IP",
+    positions: ["DM"],
+    key: ["Passing", "Composure", "Positioning", "Decisions"],
+    preferred: ["FirstTouch", "Vision", "Anticipation", "Teamwork"],
+  },
+  {
+    id: "ip_deep_lying_playmaker",
     name: "Deep-Lying Playmaker",
-    positions: ["DM", "MC", "MCL", "MCR"],
-    ip: {
-      key:       ["Passing", "Vision", "Composure", "Technique"],
-      preferred: ["FirstTouch", "Decisions", "Anticipation", "Stamina", "Flair"],
-    },
-    oop: {
-      key:       ["Positioning", "Concentration", "Anticipation", "Decisions"],
-      preferred: ["Tackling", "WorkRate", "Stamina", "Marking"],
-    },
+    phase: "IP",
+    positions: ["DM", "MC"],
+    key: ["Passing", "Vision", "Composure", "Technique", "FirstTouch"],
+    preferred: ["Decisions", "Anticipation", "Flair", "Teamwork"],
   },
   {
-    id: "regista",
-    name: "Regista",
-    positions: ["DM", "MC", "MCL", "MCR"],
-    ip: {
-      key:       ["Passing", "Vision", "Flair", "Technique", "Composure"],
-      preferred: ["FirstTouch", "Decisions", "Dribbling", "Anticipation", "Vision"],
-    },
-    oop: {
-      key:       ["Anticipation", "Decisions", "Positioning"],
-      preferred: ["Concentration", "Composure", "WorkRate", "Stamina"],
-    },
+    id: "ip_midfield_playmaker",
+    name: "Midfield Playmaker",
+    phase: "IP",
+    positions: ["DM", "MC"],
+    key: ["Passing", "Vision", "Technique", "Composure", "Flair"],
+    preferred: ["FirstTouch", "Decisions", "Anticipation", "OffTheBall"],
   },
   {
-    id: "halfback",
-    name: "Half-Back",
-    positions: ["DM"],
-    ip: {
-      key:       ["Passing", "Positioning", "Composure"],
-      preferred: ["Tackling", "Marking", "Vision", "FirstTouch", "Anticipation"],
-    },
-    oop: {
-      key:       ["Positioning", "Concentration", "Marking", "Tackling"],
-      preferred: ["Anticipation", "Strength", "WorkRate", "Stamina"],
-    },
+    id: "ip_central_midfielder",
+    name: "Central Midfielder",
+    phase: "IP",
+    positions: ["MC"],
+    key: ["Passing", "FirstTouch", "Decisions", "Stamina"],
+    preferred: ["Vision", "Composure", "Technique", "OffTheBall", "WorkRate"],
   },
   {
-    id: "anchor",
-    name: "Anchor",
-    positions: ["DM"],
-    ip: {
-      key:       ["Positioning", "Concentration", "Composure"],
-      preferred: ["Marking", "Tackling", "Passing", "Decisions", "Anticipation"],
-    },
-    oop: {
-      key:       ["Marking", "Tackling", "Positioning", "Concentration"],
-      preferred: ["Strength", "Anticipation", "WorkRate", "Stamina", "Aggression"],
-    },
-  },
-  {
-    id: "ball_winning_midfielder",
-    name: "Ball-Winning Midfielder",
-    positions: ["DM", "MC", "MCL", "MCR"],
-    ip: {
-      key:       ["Tackling", "WorkRate", "Stamina"],
-      preferred: ["Passing", "Marking", "Aggression", "Anticipation", "Strength"],
-    },
-    oop: {
-      key:       ["Tackling", "Marking", "Aggression", "WorkRate", "Stamina"],
-      preferred: ["Positioning", "Concentration", "Anticipation", "Strength", "Bravery"],
-    },
-  },
-  {
-    id: "pressing_cm",
-    name: "Pressing Central Midfielder",
-    positions: ["DM", "MC", "MCL", "MCR"],
-    ip: {
-      key:       ["Stamina", "WorkRate", "Passing"],
-      preferred: ["Tackling", "Marking", "Anticipation", "Concentration", "Decisions"],
-    },
-    oop: {
-      key:       ["WorkRate", "Stamina", "Aggression", "Anticipation"],
-      preferred: ["Tackling", "Marking", "Concentration", "Positioning", "Decisions"],
-    },
-  },
-  {
-    id: "holding_dm",
-    name: "Holding Defensive Midfielder",
-    positions: ["DM"],
-    ip: {
-      key:       ["Marking", "Tackling", "Positioning", "Concentration"],
-      preferred: ["Passing", "WorkRate", "Stamina", "Anticipation", "Decisions"],
-    },
-    oop: {
-      key:       ["Marking", "Tackling", "Positioning", "Concentration", "Anticipation"],
-      preferred: ["Strength", "WorkRate", "Stamina", "Aggression"],
-    },
-  },
-  {
-    id: "box_to_box",
+    id: "ip_box_to_box_midfielder",
     name: "Box-to-Box Midfielder",
-    positions: ["MC", "MCL", "MCR"],
-    ip: {
-      key:       ["Stamina", "Passing", "OffTheBall"],
-      preferred: ["Dribbling", "FirstTouch", "Technique", "Finishing", "WorkRate"],
-    },
-    oop: {
-      key:       ["Stamina", "WorkRate", "Tackling"],
-      preferred: ["Marking", "Positioning", "Concentration", "Anticipation", "Aggression"],
-    },
+    phase: "IP",
+    positions: ["MC"],
+    key: ["Stamina", "Passing", "OffTheBall", "WorkRate"],
+    preferred: ["Dribbling", "FirstTouch", "Technique", "Finishing", "Composure"],
   },
   {
-    id: "carrilero",
-    name: "Carrilero",
-    positions: ["MC", "MCL", "MCR"],
-    ip: {
-      key:       ["Passing", "Composure", "Stamina"],
-      preferred: ["FirstTouch", "Technique", "Decisions", "WorkRate", "Vision"],
-    },
-    oop: {
-      key:       ["WorkRate", "Stamina", "Positioning"],
-      preferred: ["Tackling", "Concentration", "Anticipation", "Marking"],
-    },
+    id: "ip_box_to_box_playmaker",
+    name: "Box-to-Box Playmaker",
+    phase: "IP",
+    positions: ["MC"],
+    key: ["Passing", "Vision", "OffTheBall", "Stamina", "Technique"],
+    preferred: ["Dribbling", "Composure", "Decisions", "FirstTouch", "Agility"],
   },
   {
-    id: "mezzala",
-    name: "Mezzala",
-    positions: ["MC", "MCL", "MCR"],
-    ip: {
-      key:       ["Passing", "Dribbling", "OffTheBall", "Technique"],
-      preferred: ["Vision", "Composure", "Flair", "Stamina", "Agility"],
-    },
-    oop: {
-      key:       ["WorkRate", "Stamina", "Concentration"],
-      preferred: ["Tackling", "Positioning", "Anticipation", "Marking"],
-    },
+    id: "ip_ball_winning_midfielder",
+    name: "Ball-Winning Midfielder",
+    phase: "IP",
+    positions: ["DM", "MC"],
+    key: ["Tackling", "WorkRate", "Stamina", "Passing"],
+    preferred: ["Aggression", "Anticipation", "Strength", "Decisions"],
   },
   {
-    id: "advanced_playmaker",
-    name: "Advanced Playmaker",
-    positions: ["MC", "MCL", "MCR", "AMC"],
-    ip: {
-      key:       ["Passing", "Vision", "Composure", "Flair", "Technique"],
-      preferred: ["Decisions", "FirstTouch", "Dribbling", "Anticipation", "OffTheBall"],
-    },
-    oop: {
-      key:       ["Anticipation", "Decisions", "Concentration"],
-      preferred: ["Positioning", "WorkRate", "Stamina"],
-    },
+    id: "ip_wide_central_midfielder",
+    name: "Wide Central Midfielder",
+    phase: "IP",
+    positions: ["MC", "ML", "MR"],
+    key: ["Passing", "Crossing", "Stamina", "OffTheBall"],
+    preferred: ["FirstTouch", "Technique", "Decisions", "WorkRate"],
   },
-];
+  {
+    id: "ip_channel_midfielder",
+    name: "Channel Midfielder",
+    phase: "IP",
+    positions: ["MC", "AML", "AMR"],
+    key: ["OffTheBall", "Dribbling", "Acceleration", "Passing"],
+    preferred: ["Technique", "Vision", "Stamina", "Agility", "Composure"],
+  },
 
-// ─────────────────────────────────────────────────────────────
-// ATTACKING MIDFIELDERS & WINGERS
-// ─────────────────────────────────────────────────────────────
-const AM_WINGER_ROLES: Role[] = [
+  // WINGERS & ATTACKING MIDFIELDERS
   {
-    id: "inside_forward",
+    id: "ip_wide_midfielder",
+    name: "Wide Midfielder",
+    phase: "IP",
+    positions: ["ML", "MR"],
+    key: ["Crossing", "Passing", "Stamina", "WorkRate"],
+    preferred: ["FirstTouch", "Technique", "Decisions", "OffTheBall"],
+  },
+  {
+    id: "ip_winger",
+    name: "Winger",
+    phase: "IP",
+    positions: ["AML", "AMR", "ML", "MR"],
+    key: ["Crossing", "Acceleration", "Pace", "Dribbling"],
+    preferred: ["Technique", "Agility", "OffTheBall", "FirstTouch"],
+  },
+  {
+    id: "ip_inside_forward",
     name: "Inside Forward",
-    positions: ["AML", "AMR", "ML", "MR"],
-    ip: {
-      key:       ["Dribbling", "Finishing", "OffTheBall", "Acceleration"],
-      preferred: ["Agility", "Technique", "Flair", "Composure", "LongShots"],
-    },
-    oop: {
-      key:       ["WorkRate", "Concentration", "Stamina"],
-      preferred: ["Anticipation", "Positioning", "Tackling", "Decisions"],
-    },
-  },
-  {
-    id: "inverted_winger",
-    name: "Inverted Winger",
-    positions: ["AML", "AMR", "ML", "MR"],
-    ip: {
-      key:       ["Dribbling", "Acceleration", "Pace", "Technique"],
-      preferred: ["Agility", "Flair", "Crossing", "LongShots", "OffTheBall"],
-    },
-    oop: {
-      key:       ["WorkRate", "Stamina", "Concentration"],
-      preferred: ["Anticipation", "Positioning", "Decisions", "Marking"],
-    },
-  },
-  {
-    id: "traditional_winger",
-    name: "Traditional Winger",
-    positions: ["AML", "AMR", "ML", "MR"],
-    ip: {
-      key:       ["Crossing", "Acceleration", "Pace", "Dribbling"],
-      preferred: ["Agility", "Technique", "OffTheBall", "Stamina", "FirstTouch"],
-    },
-    oop: {
-      key:       ["Stamina", "WorkRate"],
-      preferred: ["Concentration", "Anticipation", "Decisions", "Positioning"],
-    },
-  },
-  {
-    id: "raumdeuter",
-    name: "Raumdeuter",
+    phase: "IP",
     positions: ["AML", "AMR"],
-    ip: {
-      key:       ["OffTheBall", "Anticipation", "Finishing"],
-      preferred: ["Composure", "Concentration", "Acceleration", "Agility", "Decisions"],
-    },
-    oop: {
-      key:       ["Concentration", "Positioning", "Anticipation"],
-      preferred: ["WorkRate", "Decisions", "Stamina"],
-    },
+    key: ["Dribbling", "Finishing", "OffTheBall", "Acceleration"],
+    preferred: ["Agility", "Technique", "Flair", "Composure", "LongShots"],
   },
   {
-    id: "shadow_striker",
-    name: "Shadow Striker",
-    positions: ["AMC"],
-    ip: {
-      key:       ["OffTheBall", "Finishing", "Anticipation", "Composure"],
-      preferred: ["Agility", "Acceleration", "Decisions", "Dribbling", "Technique"],
-    },
-    oop: {
-      key:       ["WorkRate", "Stamina", "Concentration"],
-      preferred: ["Anticipation", "Positioning", "Decisions"],
-    },
-  },
-  {
-    id: "enganche",
-    name: "Enganche",
-    positions: ["AMC"],
-    ip: {
-      key:       ["Passing", "Vision", "Flair", "Composure", "Technique"],
-      preferred: ["FirstTouch", "Decisions", "Dribbling", "Anticipation"],
-    },
-    oop: {
-      key:       ["Concentration", "Anticipation"],
-      preferred: ["Decisions", "Positioning", "WorkRate"],
-    },
-  },
-  {
-    id: "attacking_midfielder",
-    name: "Attacking Midfielder",
-    positions: ["AMC"],
-    ip: {
-      key:       ["Passing", "Dribbling", "OffTheBall", "Technique"],
-      preferred: ["Vision", "Composure", "Flair", "FirstTouch", "Finishing"],
-    },
-    oop: {
-      key:       ["WorkRate", "Stamina", "Concentration"],
-      preferred: ["Anticipation", "Positioning", "Decisions"],
-    },
-  },
-  {
-    id: "pressing_wide_midfielder",
-    name: "Pressing Wide Midfielder",
+    id: "ip_inverted_winger",
+    name: "Inverted Winger",
+    phase: "IP",
     positions: ["AML", "AMR", "ML", "MR"],
-    ip: {
-      key:       ["Stamina", "WorkRate", "Crossing"],
-      preferred: ["Passing", "Pace", "Acceleration", "Dribbling", "Concentration"],
-    },
-    oop: {
-      key:       ["WorkRate", "Stamina", "Aggression", "Concentration"],
-      preferred: ["Tackling", "Anticipation", "Positioning", "Marking"],
-    },
+    key: ["Dribbling", "Acceleration", "Pace", "Technique"],
+    preferred: ["Agility", "Flair", "Crossing", "Vision", "OffTheBall"],
   },
   {
-    id: "defensive_winger",
+    id: "ip_defensive_winger",
     name: "Defensive Winger",
+    phase: "IP",
     positions: ["AML", "AMR", "ML", "MR"],
-    ip: {
-      key:       ["Crossing", "Stamina", "WorkRate"],
-      preferred: ["Pace", "Passing", "Dribbling", "Agility", "Acceleration"],
-    },
-    oop: {
-      key:       ["WorkRate", "Stamina", "Marking", "Concentration"],
-      preferred: ["Tackling", "Positioning", "Anticipation", "Aggression"],
-    },
+    key: ["Crossing", "Stamina", "WorkRate", "Passing"],
+    preferred: ["Pace", "Dribbling", "Acceleration", "Decisions"],
   },
-];
-
-// ─────────────────────────────────────────────────────────────
-// FORWARDS / STRIKERS
-// ─────────────────────────────────────────────────────────────
-const ST_ROLES: Role[] = [
   {
-    id: "advanced_forward",
+    id: "ip_wide_playmaker",
+    name: "Wide Playmaker",
+    phase: "IP",
+    positions: ["AML", "AMR", "ML", "MR"],
+    key: ["Passing", "Vision", "Composure", "FirstTouch", "Technique"],
+    preferred: ["Flair", "Decisions", "OffTheBall", "Agility"],
+  },
+  {
+    id: "ip_attacking_midfielder",
+    name: "Attacking Midfielder",
+    phase: "IP",
+    positions: ["AMC"],
+    key: ["Passing", "Dribbling", "OffTheBall", "Technique"],
+    preferred: ["Vision", "Composure", "Flair", "FirstTouch", "Finishing"],
+  },
+  {
+    id: "ip_advanced_playmaker",
+    name: "Advanced Playmaker",
+    phase: "IP",
+    positions: ["AMC"],
+    key: ["Passing", "Vision", "Composure", "Flair", "Technique"],
+    preferred: ["Decisions", "FirstTouch", "Dribbling", "Anticipation", "OffTheBall"],
+  },
+  {
+    id: "ip_shadow_striker",
+    name: "Shadow Striker",
+    phase: "IP",
+    positions: ["AMC"],
+    key: ["OffTheBall", "Finishing", "Anticipation", "Composure"],
+    preferred: ["Agility", "Acceleration", "Decisions", "Dribbling", "Technique"],
+  },
+  {
+    id: "ip_wide_forward",
+    name: "Wide Forward",
+    phase: "IP",
+    positions: ["AML", "AMR"],
+    key: ["OffTheBall", "Finishing", "Dribbling", "Acceleration", "Pace"],
+    preferred: ["Composure", "Technique", "Agility", "FirstTouch"],
+  },
+
+  // STRIKERS
+  {
+    id: "ip_centre_forward",
+    name: "Centre Forward",
+    phase: "IP",
+    positions: ["ST"],
+    key: ["Finishing", "OffTheBall", "Composure", "FirstTouch"],
+    preferred: ["Heading", "Strength", "Pace", "Decisions", "Technique"],
+  },
+  {
+    id: "ip_advanced_forward",
     name: "Advanced Forward",
-    positions: ["ST", "FC"],
-    ip: {
-      key:       ["Finishing", "OffTheBall", "Composure", "Acceleration"],
-      preferred: ["Pace", "Agility", "Dribbling", "Technique", "FirstTouch"],
-    },
-    oop: {
-      key:       ["WorkRate", "Stamina", "Concentration"],
-      preferred: ["Anticipation", "Decisions", "Positioning"],
-    },
+    phase: "IP",
+    positions: ["ST"],
+    key: ["Finishing", "OffTheBall", "Composure", "Acceleration", "Pace"],
+    preferred: ["Dribbling", "Technique", "Agility", "FirstTouch"],
   },
   {
-    id: "deep_lying_forward",
+    id: "ip_channel_forward",
+    name: "Channel Forward",
+    phase: "IP",
+    positions: ["ST"],
+    key: ["OffTheBall", "Acceleration", "Pace", "Dribbling", "Finishing"],
+    preferred: ["Stamina", "Composure", "Agility", "FirstTouch"],
+  },
+  {
+    id: "ip_deep_lying_forward",
     name: "Deep-Lying Forward",
-    positions: ["ST", "FC"],
-    ip: {
-      key:       ["Passing", "FirstTouch", "Composure", "Technique"],
-      preferred: ["Vision", "Decisions", "Dribbling", "OffTheBall", "Flair"],
-    },
-    oop: {
-      key:       ["WorkRate", "Stamina", "Anticipation"],
-      preferred: ["Positioning", "Concentration", "Decisions", "Marking"],
-    },
+    phase: "IP",
+    positions: ["ST"],
+    key: ["Passing", "FirstTouch", "Composure", "Technique", "Vision"],
+    preferred: ["Decisions", "Dribbling", "OffTheBall", "Flair"],
   },
   {
-    id: "target_forward",
-    name: "Target Forward",
-    positions: ["ST", "FC"],
-    ip: {
-      key:       ["Heading", "Strength", "Bravery", "JumpingReach"],
-      preferred: ["Finishing", "Composure", "OffTheBall", "FirstTouch", "Technique"],
-    },
-    oop: {
-      key:       ["Strength", "Bravery", "WorkRate"],
-      preferred: ["Heading", "Concentration", "Stamina", "Aggression"],
-    },
-  },
-  {
-    id: "poacher",
-    name: "Poacher",
-    positions: ["ST", "FC"],
-    ip: {
-      key:       ["Finishing", "Anticipation", "Composure", "OffTheBall"],
-      preferred: ["Acceleration", "Agility", "Concentration", "Decisions"],
-    },
-    oop: {
-      key:       ["Concentration", "Anticipation", "Positioning"],
-      preferred: ["Decisions", "WorkRate", "Composure"],
-    },
-  },
-  {
-    id: "complete_forward",
+    id: "ip_complete_forward",
     name: "Complete Forward",
-    positions: ["ST", "FC"],
-    ip: {
-      key:       ["Finishing", "Dribbling", "OffTheBall", "Technique", "FirstTouch"],
-      preferred: ["Composure", "Heading", "Passing", "Agility", "Strength"],
-    },
-    oop: {
-      key:       ["WorkRate", "Stamina", "Concentration"],
-      preferred: ["Anticipation", "Decisions", "Positioning", "WorkRate"],
-    },
-  },
-  {
-    id: "false_nine",
-    name: "False Nine",
-    positions: ["ST", "FC"],
-    ip: {
-      key:       ["Passing", "Dribbling", "Vision", "Composure", "Technique"],
-      preferred: ["FirstTouch", "Flair", "Decisions", "Agility", "OffTheBall"],
-    },
-    oop: {
-      key:       ["WorkRate", "Concentration", "Stamina"],
-      preferred: ["Anticipation", "Decisions", "Positioning"],
-    },
-  },
-  {
-    id: "pressing_forward",
-    name: "Pressing Forward",
-    positions: ["ST", "FC"],
-    ip: {
-      key:       ["WorkRate", "Stamina", "OffTheBall"],
-      preferred: ["Finishing", "Pace", "Acceleration", "Concentration", "Bravery"],
-    },
-    oop: {
-      key:       ["WorkRate", "Stamina", "Aggression", "Concentration"],
-      preferred: ["Anticipation", "Decisions", "Bravery", "Positioning"],
-    },
-  },
-  {
-    id: "high_block_outlet_forward",
-    name: "High-Block Outlet Forward",
-    positions: ["ST", "FC"],
-    ip: {
-      key:       ["Pace", "Acceleration", "OffTheBall", "Stamina"],
-      preferred: ["Finishing", "Composure", "Dribbling", "Agility"],
-    },
-    oop: {
-      key:       ["WorkRate", "Stamina", "Concentration", "Positioning"],
-      preferred: ["Anticipation", "Decisions", "Aggression", "Bravery"],
-    },
+    phase: "IP",
+    positions: ["ST"],
+    key: ["Finishing", "Heading", "OffTheBall", "Dribbling", "Passing", "Strength"],
+    preferred: ["Composure", "FirstTouch", "Technique", "Pace", "Agility"],
   },
 ];
 
 // ─────────────────────────────────────────────────────────────
-// ALL ROLES EXPORT
+// OUT-OF-POSSESSION (OOP) ROLES — FM26
 // ─────────────────────────────────────────────────────────────
-export const ALL_ROLES: Role[] = [
-  ...GK_ROLES,
-  ...CB_ROLES,
-  ...FB_ROLES,
-  ...DM_CM_ROLES,
-  ...AM_WINGER_ROLES,
-  ...ST_ROLES,
+export const OOP_ROLES: Role[] = [
+  // GOALKEEPERS
+  {
+    id: "oop_sweeper_keeper",
+    name: "Sweeper Keeper (OOP)",
+    phase: "OOP",
+    positions: ["GK"],
+    key: ["RushingOut", "OneOnOnes", "AerialReach", "Positioning", "Anticipation"],
+    preferred: ["Concentration", "Reflexes", "Bravery", "Agility"],
+  },
+  {
+    id: "oop_line_keeper",
+    name: "Line Keeper (OOP)",
+    phase: "OOP",
+    positions: ["GK"],
+    key: ["Reflexes", "Handling", "CommandOfArea", "Positioning"],
+    preferred: ["AerialReach", "Concentration", "Anticipation", "Bravery"],
+  },
+
+  // CENTRAL DEFENDERS
+  {
+    id: "oop_covering_centreback",
+    name: "Covering Centre-Back (OOP)",
+    phase: "OOP",
+    positions: ["DC"],
+    key: ["Anticipation", "Concentration", "Positioning", "Marking", "Pace"],
+    preferred: ["Tackling", "Decisions", "Heading", "Acceleration"],
+  },
+  {
+    id: "oop_stopping_centreback",
+    name: "Stopping Centre-Back (OOP)",
+    phase: "OOP",
+    positions: ["DC"],
+    key: ["Heading", "Strength", "Marking", "Tackling", "Bravery"],
+    preferred: ["Positioning", "JumpingReach", "Aggression", "Concentration"],
+  },
+  {
+    id: "oop_covering_wide_centreback",
+    name: "Covering Wide Centre-Back (OOP)",
+    phase: "OOP",
+    positions: ["DC"],
+    key: ["Positioning", "Anticipation", "Tackling", "Marking", "Pace"],
+    preferred: ["Stamina", "Decisions", "Concentration", "Acceleration"],
+  },
+  {
+    id: "oop_stopping_wide_centreback",
+    name: "Stopping Wide Centre-Back (OOP)",
+    phase: "OOP",
+    positions: ["DC"],
+    key: ["Tackling", "Marking", "Aggression", "Bravery", "Strength"],
+    preferred: ["Heading", "JumpingReach", "Positioning", "Stamina"],
+  },
+
+  // FULL-BACKS & WING-BACKS
+  {
+    id: "oop_holding_fullback",
+    name: "Holding Full-Back (OOP)",
+    phase: "OOP",
+    positions: ["DR", "DL"],
+    key: ["Marking", "Tackling", "Positioning", "Concentration"],
+    preferred: ["Anticipation", "Strength", "Stamina", "WorkRate"],
+  },
+  {
+    id: "oop_pressing_fullback",
+    name: "Pressing Full-Back (OOP)",
+    phase: "OOP",
+    positions: ["DR", "DL"],
+    key: ["WorkRate", "Stamina", "Tackling", "Aggression", "Pace"],
+    preferred: ["Positioning", "Concentration", "Anticipation", "Marking"],
+  },
+  {
+    id: "oop_holding_wingback",
+    name: "Holding Wing-Back (OOP)",
+    phase: "OOP",
+    positions: ["DR", "DL", "WBR", "WBL"],
+    key: ["Positioning", "Tackling", "Marking", "Concentration", "Stamina"],
+    preferred: ["WorkRate", "Anticipation", "Pace", "Strength"],
+  },
+  {
+    id: "oop_pressing_wingback",
+    name: "Pressing Wing-Back (OOP)",
+    phase: "OOP",
+    positions: ["DR", "DL", "WBR", "WBL"],
+    key: ["WorkRate", "Stamina", "Tackling", "Marking", "Acceleration"],
+    preferred: ["Positioning", "Concentration", "Anticipation", "Pace"],
+  },
+
+  // MIDFIELDERS
+  {
+    id: "oop_dropping_defensive_midfielder",
+    name: "Dropping Defensive Midfielder (OOP)",
+    phase: "OOP",
+    positions: ["DM"],
+    key: ["Positioning", "Concentration", "Marking", "Tackling"],
+    preferred: ["Anticipation", "Strength", "WorkRate", "Heading"],
+  },
+  {
+    id: "oop_screening_defensive_midfielder",
+    name: "Screening Defensive Midfielder (OOP)",
+    phase: "OOP",
+    positions: ["DM"],
+    key: ["Positioning", "Anticipation", "Concentration", "Tackling"],
+    preferred: ["Decisions", "Marking", "WorkRate", "Stamina"],
+  },
+  {
+    id: "oop_pressing_defensive_midfielder",
+    name: "Pressing Defensive Midfielder (OOP)",
+    phase: "OOP",
+    positions: ["DM"],
+    key: ["WorkRate", "Stamina", "Tackling", "Aggression", "Anticipation"],
+    preferred: ["Positioning", "Concentration", "Strength", "Bravery"],
+  },
+  {
+    id: "oop_wide_cover_defensive_midfielder",
+    name: "Wide-Cover Defensive Midfielder (OOP)",
+    phase: "OOP",
+    positions: ["DM"],
+    key: ["WorkRate", "Stamina", "Positioning", "Tackling", "Pace"],
+    preferred: ["Marking", "Concentration", "Anticipation", "Agility"],
+  },
+  {
+    id: "oop_pressing_central_midfielder",
+    name: "Pressing Central Midfielder (OOP)",
+    phase: "OOP",
+    positions: ["MC"],
+    key: ["WorkRate", "Stamina", "Aggression", "Tackling", "Anticipation"],
+    preferred: ["Concentration", "Positioning", "Decisions", "Pace"],
+  },
+  {
+    id: "oop_screening_central_midfielder",
+    name: "Screening Central Midfielder (OOP)",
+    phase: "OOP",
+    positions: ["MC"],
+    key: ["Positioning", "Concentration", "Tackling", "Decisions"],
+    preferred: ["Anticipation", "WorkRate", "Stamina", "Marking"],
+  },
+  {
+    id: "oop_wide_cover_central_midfielder",
+    name: "Wide-Cover Central Midfielder (OOP)",
+    phase: "OOP",
+    positions: ["MC"],
+    key: ["WorkRate", "Stamina", "Positioning", "Tackling", "Marking"],
+    preferred: ["Concentration", "Anticipation", "Pace", "Agility"],
+  },
+
+  // WINGERS & ATTACKING MIDFIELDERS
+  {
+    id: "oop_tracking_attacking_midfielder",
+    name: "Tracking Attacking Midfielder (OOP)",
+    phase: "OOP",
+    positions: ["AMC"],
+    key: ["WorkRate", "Stamina", "Concentration", "Positioning"],
+    preferred: ["Anticipation", "Tackling", "Decisions"],
+  },
+  {
+    id: "oop_central_outlet_midfielder",
+    name: "Central Outlet Midfielder (OOP)",
+    phase: "OOP",
+    positions: ["AMC"],
+    key: ["OffTheBall", "Anticipation", "Pace", "Composure"],
+    preferred: ["Acceleration", "Decisions", "Vision"],
+  },
+  {
+    id: "oop_splitting_outlet_midfielder",
+    name: "Splitting Outlet Midfielder (OOP)",
+    phase: "OOP",
+    positions: ["AMC"],
+    key: ["OffTheBall", "Acceleration", "Flair", "Decisions"],
+    preferred: ["Pace", "Composure", "Agility"],
+  },
+  {
+    id: "oop_tracking_wide_midfielder",
+    name: "Tracking Wide Midfielder (OOP)",
+    phase: "OOP",
+    positions: ["ML", "MR"],
+    key: ["WorkRate", "Stamina", "Marking", "Concentration"],
+    preferred: ["Tackling", "Positioning", "Anticipation"],
+  },
+  {
+    id: "oop_wide_outlet_midfielder",
+    name: "Wide Outlet Midfielder (OOP)",
+    phase: "OOP",
+    positions: ["ML", "MR"],
+    key: ["Pace", "Acceleration", "OffTheBall", "Flair"],
+    preferred: ["Dribbling", "Crossing", "Agility"],
+  },
+  {
+    id: "oop_tracking_winger",
+    name: "Tracking Winger (OOP)",
+    phase: "OOP",
+    positions: ["AML", "AMR"],
+    key: ["WorkRate", "Stamina", "Concentration", "Tackling"],
+    preferred: ["Positioning", "Anticipation", "Pace"],
+  },
+  {
+    id: "oop_inverting_outlet_winger",
+    name: "Inverting Outlet Winger (OOP)",
+    phase: "OOP",
+    positions: ["AML", "AMR"],
+    key: ["OffTheBall", "Acceleration", "Dribbling", "Anticipation"],
+    preferred: ["Finishing", "Composure", "Agility"],
+  },
+  {
+    id: "oop_wide_outlet_winger",
+    name: "Wide Outlet Winger (OOP)",
+    phase: "OOP",
+    positions: ["AML", "AMR"],
+    key: ["Pace", "Acceleration", "OffTheBall", "Flair"],
+    preferred: ["Crossing", "Dribbling", "Agility"],
+  },
+
+  // STRIKERS
+  {
+    id: "oop_tracking_centre_forward",
+    name: "Pressing Centre Forward (OOP)",
+    phase: "OOP",
+    positions: ["ST"],
+    key: ["WorkRate", "Stamina", "Aggression", "Concentration"],
+    preferred: ["Anticipation", "Decisions", "Bravery"],
+  },
+  {
+    id: "oop_central_outlet_forward",
+    name: "Central Outlet Forward (OOP)",
+    phase: "OOP",
+    positions: ["ST"],
+    key: ["OffTheBall", "Acceleration", "Composure", "Finishing"],
+    preferred: ["Pace", "Anticipation", "FirstTouch"],
+  },
+  {
+    id: "oop_splitting_outlet_forward",
+    name: "Splitting Outlet Forward (OOP)",
+    phase: "OOP",
+    positions: ["ST"],
+    key: ["OffTheBall", "Acceleration", "Pace", "Agility"],
+    preferred: ["Dribbling", "Composure", "Finishing"],
+  },
 ];
+
+// ─────────────────────────────────────────────────────────────
+// EXPORTS & HELPERS
+// ─────────────────────────────────────────────────────────────
+export const ALL_ROLES: Role[] = [...IP_ROLES, ...OOP_ROLES];
 
 export const ROLE_BY_ID = Object.fromEntries(ALL_ROLES.map((r) => [r.id, r]));
 
-export function getRolesForPosition(pos?: string): Role[] {
-  if (!pos) return ALL_ROLES;
+export function getRolesForPosition(pos?: string, phase?: RolePhase | "ALL"): Role[] {
+  let roles = ALL_ROLES;
+  if (phase && phase !== "ALL") {
+    roles = roles.filter((r) => r.phase === phase);
+  }
+  if (!pos) return roles;
+
   const clean = pos.trim().toUpperCase();
-  return ALL_ROLES.filter((role) =>
+  return roles.filter((role) =>
     role.positions.some((rp) => rp === clean || clean.startsWith(rp) || rp.startsWith(clean))
   );
 }

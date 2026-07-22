@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useApp } from "../context/AppContext";
-import { scorePlayer } from "../engine/ratingEngine";
+import { topIpRoles, topOopRoles } from "../engine/ratingEngine";
 import type { Player } from "../data/types";
 
 function fmt(v: number) {
@@ -59,8 +59,8 @@ export function PlayerDrawer() {
 
   if (!player) return null;
 
-  const scores = scorePlayer(player);
-  const topScores = scores.slice(0, 12);
+  const ipList = topIpRoles(player, 5);
+  const oopList = topOopRoles(player, 5);
 
   const close = () => setSelectedId(null);
 
@@ -73,7 +73,7 @@ export function PlayerDrawer() {
           <div>
             <div className="drawer-name">{player.name}</div>
             <div className="drawer-meta">
-              {player.pos} · {player.nat.join(", ")} · Age {player.age} · {player.club}
+              {player.pos} · {player.nat?.join(", ") || "N/A"} · Age {player.age} · {player.club || "Free Agent"}
             </div>
             {player.div && (
               <div className="drawer-meta" style={{ marginTop: 2, fontSize: 11, opacity: 0.6 }}>
@@ -126,23 +126,47 @@ export function PlayerDrawer() {
             </div>
           </div>
 
-          {/* Top Role Scores (IP vs OOP) */}
+          {/* In-Possession (IP) Roles */}
           <div>
-            <div className="drawer-section-title">Best Roles (IP vs OOP)</div>
+            <div className="drawer-section-title">
+              In-Possession Roles <span className="pos-pill" style={{ marginLeft: 6 }}>FM26 IP</span>
+            </div>
             <div className="role-score-grid">
-              {topScores.map((rs) => (
-                <div key={rs.roleId} className="role-score-row">
-                  <span className="role-score-name">{rs.roleName}</span>
-                  <div className="role-score-val">
-                    <span className="role-score-label">IP</span>
-                    <span className={`role-score-num ${scoreColor(rs.ipScore)}`}>{rs.ipScore}</span>
+              {ipList.length === 0 ? (
+                <div style={{ fontSize: 11, color: "var(--text-muted)", padding: 8 }}>No matching IP roles for position</div>
+              ) : (
+                ipList.map((rs) => (
+                  <div key={rs.roleId} className="role-score-row" style={{ gridTemplateColumns: "1fr 80px" }}>
+                    <span className="role-score-name">{rs.roleName}</span>
+                    <div className="role-score-val">
+                      <span className="role-score-label">IP SCORE</span>
+                      <span className={`role-score-num ${scoreColor(rs.ipScore)}`}>{rs.ipScore}</span>
+                    </div>
                   </div>
-                  <div className="role-score-val">
-                    <span className="role-score-label">OOP</span>
-                    <span className={`role-score-num ${scoreColor(rs.oopScore)}`}>{rs.oopScore}</span>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Out-of-Possession (OOP) Roles */}
+          <div>
+            <div className="drawer-section-title">
+              Out-of-Possession Roles <span className="pos-pill" style={{ marginLeft: 6 }}>FM26 OOP</span>
+            </div>
+            <div className="role-score-grid">
+              {oopList.length === 0 ? (
+                <div style={{ fontSize: 11, color: "var(--text-muted)", padding: 8 }}>No matching OOP roles for position</div>
+              ) : (
+                oopList.map((rs) => (
+                  <div key={rs.roleId} className="role-score-row" style={{ gridTemplateColumns: "1fr 80px" }}>
+                    <span className="role-score-name">{rs.roleName}</span>
+                    <div className="role-score-val">
+                      <span className="role-score-label">OOP SCORE</span>
+                      <span className={`role-score-num ${scoreColor(rs.oopScore)}`}>{rs.oopScore}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
