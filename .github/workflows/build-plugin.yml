@@ -1,0 +1,53 @@
+name: Build FMAnalyzer Installer
+
+on:
+  push:
+    branches: [ "main" ]
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build FMAnalyzer.exe
+      run: npm run build:exe
+
+    - name: Verify Plugin Exists
+      run: |
+        if (!(Test-Path "plugin\bin\Release\netstandard2.1\FMAnalyzer.dll")) {
+          Write-Error "Error: FMAnalyzer.dll not found! You must compile it on your PC and push it to GitHub."
+          exit 1
+        }
+      shell: pwsh
+
+    - name: Build Setup.exe with Inno Setup
+      run: iscc installer.iss
+
+    - name: Upload Setup Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: FMAnalyzer-Setup
+        path: dist-setup/FMAnalyzer-Setup.exe
+
+    - name: Attach to Release
+      if: github.event_name == 'release'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist-setup/FMAnalyzer-Setup.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
