@@ -139,8 +139,8 @@ export function PlayerTable() {
                 {!hiddenMode && <Th label="PA" k="pa" />}
                 <Th label="Value" k="value" />
                 <th>{ipRoleName ? `IP Role: ${ipRoleName}` : "Best IP Role"}</th>
-                <th>IP</th>
-                <th>OOP</th>
+                <Th label="IP" k="role_ip" />
+                <Th label="OOP" k="role_oop" />
                 <th>Expires</th>
               </tr>
             </thead>

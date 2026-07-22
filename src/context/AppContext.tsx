@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 import type { Dump, Player } from "../data/types";
-import { scoreSingleRole } from "../engine/ratingEngine";
+import { scoreSingleRole, topIpRoles, topOopRoles } from "../engine/ratingEngine";
 
 interface Filters {
   search: string;
@@ -110,12 +110,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (filters.paMax)  list = list.filter((p) => p.pa  <= +filters.paMax);
     if (filters.valueMax) list = list.filter((p) => p.value <= +filters.valueMax);
 
-    const key = sortKey as keyof Player;
-    list = [...list].sort((a, b) => {
-      const av = (a[key] as number) ?? 0;
-      const bv = (b[key] as number) ?? 0;
-      return sortDir === "desc" ? bv - av : av - bv;
-    });
+    if (sortKey === "role_ip") {
+      list = [...list].sort((a, b) => {
+        const av = filters.ipRole ? (scoreSingleRole(a, filters.ipRole)?.ipScore ?? 0) : (topIpRoles(a, 1)[0]?.ipScore ?? 0);
+        const bv = filters.ipRole ? (scoreSingleRole(b, filters.ipRole)?.ipScore ?? 0) : (topIpRoles(b, 1)[0]?.ipScore ?? 0);
+        return sortDir === "desc" ? bv - av : av - bv;
+      });
+    } else if (sortKey === "role_oop") {
+      list = [...list].sort((a, b) => {
+        const av = filters.oopRole ? (scoreSingleRole(a, filters.oopRole)?.oopScore ?? 0) : (topOopRoles(a, 1)[0]?.oopScore ?? 0);
+        const bv = filters.oopRole ? (scoreSingleRole(b, filters.oopRole)?.oopScore ?? 0) : (topOopRoles(b, 1)[0]?.oopScore ?? 0);
+        return sortDir === "desc" ? bv - av : av - bv;
+      });
+    } else {
+      const key = sortKey as keyof Player;
+      list = [...list].sort((a, b) => {
+        const av = (a[key] as number) ?? 0;
+        const bv = (b[key] as number) ?? 0;
+        return sortDir === "desc" ? bv - av : av - bv;
+      });
+    }
 
     return list;
   }, [dump, filters, sortKey, sortDir]);
