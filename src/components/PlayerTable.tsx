@@ -3,14 +3,11 @@ import { useApp } from "../context/AppContext";
 import type { Player } from "../data/types";
 import { scoreSingleRole, topIpRoles, topOopRoles } from "../engine/ratingEngine";
 import { ROLE_BY_ID } from "../data/roleDefinitions";
+import { formatPlayerValue } from "../utils/valueUtils";
 
 const PAGE_SIZE = 50;
 
-function fmt(v: number) {
-  if (v >= 1_000_000) return `£${(v / 1_000_000).toFixed(1)}M`;
-  if (v >= 1_000)     return `£${(v / 1_000).toFixed(0)}K`;
-  return `£${v}`;
-}
+
 
 function scoreClass(n: number) {
   if (n >= 80) return "score-s";
@@ -179,7 +176,7 @@ export function PlayerTable() {
                       {p.pa}
                     </td>
                   )}
-                  <td className="value-text">{fmt(p.value)}</td>
+                  <td className="value-text">{formatPlayerValue(p)}</td>
                   <td style={{ color: "var(--text-secondary)", fontSize: 11 }}>{topIpRoleName}</td>
                   <td>
                     <span className={`score-chip ${scoreClass(topIpScore)}`}>{topIpScore}</span>

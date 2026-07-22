@@ -2,12 +2,9 @@ import { useState } from "react";
 import { useApp } from "../context/AppContext";
 import type { Player } from "../data/types";
 import { topIpRoles, topOopRoles } from "../engine/ratingEngine";
+import { formatPlayerValue } from "../utils/valueUtils";
 
-function fmt(v: number) {
-  if (v >= 1_000_000) return `£${(v / 1_000_000).toFixed(1)}M`;
-  if (v >= 1_000)     return `£${(v / 1_000).toFixed(0)}K`;
-  return `£${v}`;
-}
+
 
 const ATTR_GROUPS = [
   {
@@ -135,7 +132,7 @@ export function PlayerComparison() {
                 )}
                 <div>
                   <span style={{ fontSize: 10, color: "var(--text-muted)" }}>Value</span>
-                  <div style={{ fontWeight: 700 }}>{fmt(p.value)}</div>
+                  <div style={{ fontWeight: 700 }}>{formatPlayerValue(p)}</div>
                 </div>
                 <div>
                   <span style={{ fontSize: 10, color: "var(--text-muted)" }}>Age</span>

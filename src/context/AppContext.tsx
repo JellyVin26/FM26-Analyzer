@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 import type { Dump, Player } from "../data/types";
 import { scoreSingleRole, topIpRoles, topOopRoles } from "../engine/ratingEngine";
+import { getPlayerValue } from "../utils/valueUtils";
 
 interface Filters {
   search: string;
@@ -147,6 +148,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       list = [...list].sort((a, b) => {
         const av = filters.oopRole ? (scoreSingleRole(a, filters.oopRole)?.oopScore ?? 0) : (topOopRoles(a, 1)[0]?.oopScore ?? 0);
         const bv = filters.oopRole ? (scoreSingleRole(b, filters.oopRole)?.oopScore ?? 0) : (topOopRoles(b, 1)[0]?.oopScore ?? 0);
+        return sortDir === "desc" ? bv - av : av - bv;
+      });
+    } else if (sortKey === "value") {
+      list = [...list].sort((a, b) => {
+        const av = getPlayerValue(a);
+        const bv = getPlayerValue(b);
         return sortDir === "desc" ? bv - av : av - bv;
       });
     } else {

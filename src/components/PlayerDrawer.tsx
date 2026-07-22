@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useApp } from "../context/AppContext";
 import { topIpRoles, topOopRoles } from "../engine/ratingEngine";
 import type { Player } from "../data/types";
+import { formatPlayerValue } from "../utils/valueUtils";
 
 function fmt(v: number) {
   if (v >= 1_000_000) return `£${(v / 1_000_000).toFixed(1)}M`;
@@ -114,7 +115,7 @@ export function PlayerDrawer() {
               )}
               <div className="stat-cell">
                 <div className="stat-cell-label">Value</div>
-                <div className="stat-cell-val" style={{ fontSize: 13 }}>{fmt(player.value)}</div>
+                <div className="stat-cell-val" style={{ fontSize: 13 }}>{formatPlayerValue(player)}</div>
               </div>
               <div className="stat-cell">
                 <div className="stat-cell-label">Wage</div>
