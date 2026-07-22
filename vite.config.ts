@@ -17,7 +17,7 @@ export default defineConfig({
       configureServer(server) {
         server.middlewares.use('/api/dump', (_req, res) => {
           const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
-          const analyzerDir = path.join(localAppData, 'FMAnalyzer');
+          const analyzerDir = path.join(localAppData, 'FMSuperScout');
           const dumpPath = path.join(analyzerDir, 'data.json');
 
           if (fs.existsSync(dumpPath)) {
@@ -37,7 +37,8 @@ export default defineConfig({
         server.middlewares.use('/api/sync', async (_req, res) => {
           try {
             const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
-            const analyzerDir = path.join(localAppData, 'FMAnalyzer');
+            // Using FMSuperScout path here so we can seamlessly use the pre-compiled DLL!
+            const analyzerDir = path.join(localAppData, 'FMSuperScout');
             const dumpPath = path.join(analyzerDir, 'data.json');
             const flagPath = path.join(analyzerDir, 'request.flag');
             
@@ -75,10 +76,7 @@ export default defineConfig({
 
             if (dumpUpdated && fs.existsSync(dumpPath)) {
               res.setHeader('Content-Type', 'application/json');
-              res.setHeader('Access-Control-Allow-Origin', '*');
-              res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-              res.setHeader('Pragma', 'no-cache');
-              res.setHeader('Expires', '0');
+              res.setHeader('Cache-Control', 'no-store');
               fs.createReadStream(dumpPath).pipe(res);
             } else {
               res.statusCode = 504;

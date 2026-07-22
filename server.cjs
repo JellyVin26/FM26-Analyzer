@@ -12,7 +12,7 @@ app.use(express.static(path.join(__dirname, 'dist')));
 // Endpoint for initial load
 app.get('/api/dump', (req, res) => {
   const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
-  const analyzerDir = path.join(localAppData, 'FMAnalyzer');
+  const analyzerDir = path.join(localAppData, 'FMSuperScout');
   const dumpPath = path.join(analyzerDir, 'data.json');
 
   if (fs.existsSync(dumpPath)) {
@@ -31,7 +31,8 @@ app.get('/api/dump', (req, res) => {
 app.get('/api/sync', async (req, res) => {
   try {
     const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
-    const analyzerDir = path.join(localAppData, 'FMAnalyzer');
+    // Using FMSuperScout path here so we can seamlessly use the pre-compiled DLL!
+    const analyzerDir = path.join(localAppData, 'FMSuperScout');
     const dumpPath = path.join(analyzerDir, 'data.json');
     const flagPath = path.join(analyzerDir, 'request.flag');
     
