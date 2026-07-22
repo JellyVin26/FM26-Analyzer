@@ -31,7 +31,7 @@ interface Row {
 }
 
 export function PlayerTable() {
-  const { filteredPlayers, setSelectedId, selectedId, sortKey, sortDir, setSort, hiddenMode, filters, addComparePlayer, comparedIds } = useApp();
+  const { filteredPlayers, setSelectedId, selectedId, sortKey, sortDir, setSort, hiddenMode, filters, setFilter, addComparePlayer, comparedIds } = useApp();
   const [page, setPage] = useState(0);
 
   const ipRoleName = filters.ipRole ? ROLE_BY_ID[filters.ipRole]?.name || filters.ipRole : null;
@@ -114,7 +114,17 @@ export function PlayerTable() {
             <button className="btn" onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={safeePage >= totalPages - 1}>›</button>
           </div>
         )}
-        <button className="btn" onClick={exportCSV}>⬇ Export CSV</button>
+        <div style={{ display: "flex", gap: 15, alignItems: "center" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--text-secondary)", cursor: "pointer" }}>
+            <input 
+              type="checkbox" 
+              checked={filters.includeOwnPlayers === "true"}
+              onChange={(e) => setFilter("includeOwnPlayers", e.target.checked ? "true" : "false")}
+            />
+            Include own players
+          </label>
+          <button className="btn" onClick={exportCSV}>⬇ Export CSV</button>
+        </div>
       </div>
 
       <div className="table-scroll">

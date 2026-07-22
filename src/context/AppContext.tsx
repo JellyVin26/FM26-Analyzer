@@ -21,6 +21,7 @@ interface Filters {
   valueMax: string;
   contractExpiry: string;
   transferStatus: string;
+  includeOwnPlayers: string;
 }
 
 export type TabView = "scout" | "compare" | "gaps" | "advisor" | "squad" | "shortlist";
@@ -57,7 +58,7 @@ interface AppState {
 const DEFAULT_FILTERS: Filters = {
   search: "", pos: "", ipRole: "", minIpScore: "", oopRole: "", minOopScore: "", club: "", nationality: "",
   ageMin: "", ageMax: "", caMin: "", caMax: "",
-  paMin: "", paMax: "", valueMax: "", contractExpiry: "", transferStatus: "",
+  paMin: "", paMax: "", valueMax: "", contractExpiry: "", transferStatus: "", includeOwnPlayers: "false",
 };
 
 const Ctx = createContext<AppState>(null!);
@@ -124,6 +125,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     const s = filters.search.toLowerCase();
     if (s) list = list.filter((p) => (p.searchName || p.name || "").toLowerCase().includes(s) || (p.club || "").toLowerCase().includes(s));
+    
+    if (filters.includeOwnPlayers === "false" && dump.meta?.myClub) {
+      list = list.filter((p) => p.club !== dump.meta.myClub);
+    }
+
     if (filters.pos) {
       const targetPos = filters.pos;
       list = list.filter((p) => {
