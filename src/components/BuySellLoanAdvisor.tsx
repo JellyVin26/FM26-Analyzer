@@ -19,15 +19,9 @@ const POS_GROUPS = [
 
 export function BuySellLoanAdvisor() {
   const { dump, hiddenMode } = useApp();
-  const [selectedClub, setSelectedClub] = useState<string>("");
   const [budgetM, setBudgetM] = useState<string>("40");
 
-  const clubs = useMemo(
-    () => (dump ? [...new Set(dump.players.map((p) => p.club).filter(Boolean))].sort() : []),
-    [dump]
-  );
-
-  const activeClub = selectedClub || dump?.meta.myClub || clubs[0] || "";
+  const activeClub = dump?.meta.myClub || "";
 
   const mySquad = useMemo(
     () => (dump ? dump.players.filter((p) => p.club === activeClub) : []),
@@ -180,19 +174,8 @@ export function BuySellLoanAdvisor() {
             />
           </div>
 
-          {/* Club Selector */}
-          <select
-            className="filter-select"
-            value={activeClub}
-            onChange={(e) => setSelectedClub(e.target.value)}
-            style={{ minWidth: 200 }}
-          >
-            {clubs.map((c) => (
-              <option key={c} value={c}>
-                {c} {c === dump?.meta.myClub ? "(Your Club)" : ""}
-              </option>
-            ))}
-          </select>
+          {/* Club name badge - always shows your club */}
+          <strong style={{ color: "var(--accent)", fontSize: 13 }}>📋 {activeClub}</strong>
         </div>
       </div>
 

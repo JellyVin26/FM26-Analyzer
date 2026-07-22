@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useApp } from "../context/AppContext";
 import { topIpRoles, topOopRoles } from "../engine/ratingEngine";
 
@@ -22,14 +22,8 @@ function gradeGroup(avgCA: number): { grade: string; color: string } {
 
 export function SquadGapAnalysis() {
   const { dump, hiddenMode } = useApp();
-  const [selectedClub, setSelectedClub] = useState<string>("");
 
-  const clubs = useMemo(
-    () => (dump ? [...new Set(dump.players.map((p) => p.club).filter(Boolean))].sort() : []),
-    [dump]
-  );
-
-  const activeClub = selectedClub || dump?.meta.myClub || clubs[0] || "";
+  const activeClub = dump?.meta.myClub || "";
 
   const squadPlayers = useMemo(
     () => (dump ? dump.players.filter((p) => p.club === activeClub) : []),
@@ -46,19 +40,10 @@ export function SquadGapAnalysis() {
           </div>
         </div>
 
-        {/* Club Selector */}
-        <select
-          className="filter-select"
-          value={activeClub}
-          onChange={(e) => setSelectedClub(e.target.value)}
-          style={{ minWidth: 220 }}
-        >
-          {clubs.map((c) => (
-            <option key={c} value={c}>
-              {c} {c === dump?.meta.myClub ? "(Your Club)" : ""}
-            </option>
-          ))}
-        </select>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 13, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>📋</span>
+          <strong style={{ color: "var(--accent)", fontSize: 13 }}>{activeClub}</strong>
+        </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: 16 }}>
