@@ -37,7 +37,7 @@ export function SquadGapAnalysis() {
   );
 
   return (
-    <div className="squad-gaps-pane" style={{ padding: 24, flex: 1, overflowY: "auto" }}>
+    <div className="squad-gaps-pane" style={{ padding: 24, width: "100%", height: "100%", overflowY: "auto", boxSizing: "border-box" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
         <div>
           <h2 style={{ fontSize: 20, margin: 0, color: "var(--text-primary)" }}>Squad Gap Analysis</h2>

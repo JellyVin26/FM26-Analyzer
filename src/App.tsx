@@ -90,11 +90,11 @@ export function App() {
       <div className="main-content">
         {dump ? (
           activeTab === "scout" ? (
-            <>
+            <div className="scout-layout">
               <Sidebar />
               <PlayerTable />
               <PlayerDrawer />
-            </>
+            </div>
           ) : activeTab === "compare" ? (
             <PlayerComparison />
           ) : activeTab === "gaps" ? (
@@ -103,7 +103,7 @@ export function App() {
             <BuySellLoanAdvisor />
           )
         ) : (
-          <div style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <FileDrop />
           </div>
         )}
