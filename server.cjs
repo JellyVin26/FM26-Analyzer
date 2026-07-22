@@ -12,7 +12,8 @@ app.use(express.static(path.join(__dirname, 'dist')));
 // Endpoint for initial load
 app.get('/api/dump', (req, res) => {
   const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
-  const dumpPath = path.join(localAppData, 'FMSuperScout', 'dump.json');
+  const analyzerDir = path.join(localAppData, 'FMAnalyzer');
+  const dumpPath = path.join(analyzerDir, 'data.json');
 
   if (fs.existsSync(dumpPath)) {
     res.setHeader('Content-Type', 'application/json');
@@ -22,19 +23,19 @@ app.get('/api/dump', (req, res) => {
     res.setHeader('Expires', '0');
     fs.createReadStream(dumpPath).pipe(res);
   } else {
-    res.status(404).json({ error: `dump.json not found at ${dumpPath}` });
+    res.status(404).json({ error: `data.json not found at ${dumpPath}` });
   }
 });
 
 // Endpoint for triggering live sync
 app.get('/api/sync', async (req, res) => {
   const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
-  const fmscoutDir = path.join(localAppData, 'FMSuperScout');
-  const dumpPath = path.join(fmscoutDir, 'dump.json');
-  const flagPath = path.join(fmscoutDir, 'request.flag');
+  const analyzerDir = path.join(localAppData, 'FMAnalyzer');
+  const dumpPath = path.join(analyzerDir, 'data.json');
+  const flagPath = path.join(analyzerDir, 'request.flag');
   
-  if (!fs.existsSync(fmscoutDir)) {
-    fs.mkdirSync(fmscoutDir, { recursive: true });
+  if (!fs.existsSync(analyzerDir)) {
+    fs.mkdirSync(analyzerDir, { recursive: true });
   }
 
   let initialMtime = 0;

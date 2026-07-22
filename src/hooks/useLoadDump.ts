@@ -15,7 +15,7 @@ export function useLoadDump() {
       const text = await file.text();
       const data: Dump = JSON.parse(text);
       if (!data.players || !Array.isArray(data.players)) {
-        throw new Error("Not a valid FMSuperScout dump.json — no players array found.");
+        throw new Error("Not a valid FM Analyzer data.json — no players array found.");
       }
       setDump(data);
       localStorage.setItem(DUMP_PATH_KEY, file.name);
@@ -34,11 +34,11 @@ export function useLoadDump() {
         cache: "no-store"
       });
       if (!res.ok) {
-        throw new Error("No local FM26 dump found at AppData/Local/FMSuperScout/dump.json");
+        throw new Error("No local FM26 dump found at AppData/Local/FM Analyzer/dump.json");
       }
       const data: Dump = await res.json();
       if (!data.players || !Array.isArray(data.players)) {
-        throw new Error("Not a valid FMSuperScout dump.json.");
+        throw new Error("Not a valid FM Analyzer data.json.");
       }
       setDump(data);
       localStorage.setItem(DUMP_PATH_KEY, "auto_dump.json");
@@ -66,7 +66,7 @@ export function useLoadDump() {
       }
       const data: Dump = await res.json();
       if (!data.players || !Array.isArray(data.players)) {
-        throw new Error("Not a valid FMSuperScout dump.json.");
+        throw new Error("Not a valid FM Analyzer data.json.");
       }
       setDump(data);
       localStorage.setItem(DUMP_PATH_KEY, "live_sync.json");

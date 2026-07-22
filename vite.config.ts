@@ -17,7 +17,8 @@ export default defineConfig({
       configureServer(server) {
         server.middlewares.use('/api/dump', (_req, res) => {
           const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
-          const dumpPath = path.join(localAppData, 'FMSuperScout', 'dump.json');
+          const analyzerDir = path.join(localAppData, 'FMAnalyzer');
+          const dumpPath = path.join(analyzerDir, 'data.json');
 
           if (fs.existsSync(dumpPath)) {
             res.setHeader('Content-Type', 'application/json');
@@ -28,18 +29,18 @@ export default defineConfig({
             fs.createReadStream(dumpPath).pipe(res);
           } else {
             res.statusCode = 404;
-            res.end(JSON.stringify({ error: `dump.json not found at ${dumpPath}` }));
+            res.end(JSON.stringify({ error: `data.json not found` }));
           }
         });
 
         server.middlewares.use('/api/sync', async (_req, res) => {
           const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
-          const fmscoutDir = path.join(localAppData, 'FMSuperScout');
-          const dumpPath = path.join(fmscoutDir, 'dump.json');
-          const flagPath = path.join(fmscoutDir, 'request.flag');
+          const analyzerDir = path.join(localAppData, 'FMAnalyzer');
+          const dumpPath = path.join(analyzerDir, 'data.json');
+          const flagPath = path.join(analyzerDir, 'request.flag');
           
-          if (!fs.existsSync(fmscoutDir)) {
-            fs.mkdirSync(fmscoutDir, { recursive: true });
+          if (!fs.existsSync(analyzerDir)) {
+            fs.mkdirSync(analyzerDir, { recursive: true });
           }
 
           let initialMtime = 0;

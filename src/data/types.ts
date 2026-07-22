@@ -1,4 +1,4 @@
-// FM26 Player types — mirrors the FMSuperScout dump.json schema (v0.1.33, game 26.3.2)
+// FM26 Player types — mirrors the FM Analyzer data.json schema (v0.1.33, game 26.3.2)
 
 export interface PlayerAttrs {
   Crossing: number; Dribbling: number; Finishing: number; Heading: number;
