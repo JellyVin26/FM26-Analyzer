@@ -28,55 +28,59 @@ app.get('/api/dump', (req, res) => {
   }
 });
 
-// Endpoint for triggering live sync
 app.get('/api/sync', async (req, res) => {
-  const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
-  const analyzerDir = path.join(localAppData, 'FMAnalyzer');
-  const dumpPath = path.join(analyzerDir, 'data.json');
-  const flagPath = path.join(analyzerDir, 'request.flag');
-  
-  if (!fs.existsSync(analyzerDir)) {
-    fs.mkdirSync(analyzerDir, { recursive: true });
-  }
+  try {
+    const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
+    const analyzerDir = path.join(localAppData, 'FMAnalyzer');
+    const dumpPath = path.join(analyzerDir, 'data.json');
+    const flagPath = path.join(analyzerDir, 'request.flag');
+    
+    if (!fs.existsSync(analyzerDir)) {
+      fs.mkdirSync(analyzerDir, { recursive: true });
+    }
 
-  let initialMtime = 0;
-  if (fs.existsSync(dumpPath)) {
-    initialMtime = fs.statSync(dumpPath).mtimeMs;
-  }
-
-  // Trigger the plugin by creating request.flag
-  fs.writeFileSync(flagPath, '1');
-
-  const maxWaitMs = 15000;
-  const pollIntervalMs = 500;
-  let waited = 0;
-  let dumpUpdated = false;
-
-  while (waited < maxWaitMs) {
-    await new Promise(r => setTimeout(r, pollIntervalMs));
-    waited += pollIntervalMs;
-
+    let initialMtime = 0;
     if (fs.existsSync(dumpPath)) {
-      const currentMtime = fs.statSync(dumpPath).mtimeMs;
-      if (currentMtime > initialMtime) {
-        // Wait an extra 500ms to ensure the plugin has finished writing the 67MB file
-        await new Promise(r => setTimeout(r, 500));
-        dumpUpdated = true;
-        break;
+      initialMtime = fs.statSync(dumpPath).mtimeMs;
+    }
+
+    // Trigger the plugin by creating request.flag
+    fs.writeFileSync(flagPath, '1');
+
+    const maxWaitMs = 15000;
+    const pollIntervalMs = 500;
+    let waited = 0;
+    let dumpUpdated = false;
+
+    while (waited < maxWaitMs) {
+      await new Promise(r => setTimeout(r, pollIntervalMs));
+      waited += pollIntervalMs;
+
+      if (fs.existsSync(dumpPath)) {
+        const currentMtime = fs.statSync(dumpPath).mtimeMs;
+        if (currentMtime > initialMtime) {
+          // Wait an extra 500ms to ensure the plugin has finished writing the 67MB file
+          await new Promise(r => setTimeout(r, 500));
+          dumpUpdated = true;
+          break;
+        }
       }
     }
-  }
 
-  if (dumpUpdated && fs.existsSync(dumpPath)) {
-    res.setHeader('Content-Type', 'application/json');
+    if (dumpUpdated && fs.existsSync(dumpPath)) {
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      fs.createReadStream(dumpPath).pipe(res);
+    } else {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.status(504).json({ error: 'Timeout waiting for game to dump data. Is FM26 running?' });
+    }
+  } catch (err) {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    fs.createReadStream(dumpPath).pipe(res);
-  } else {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.status(504).json({ error: 'Timeout waiting for game to dump data. Is FM26 running?' });
+    res.status(500).json({ error: `Server error during sync: ${err.message}` });
   }
 });
 
