@@ -30,42 +30,42 @@ function TopBar() {
       </div>
 
       {dump && (
-        <nav style={{ display: "flex", gap: 8, marginLeft: 20 }}>
+        <nav className="topbar-nav">
           <button
-            className={`btn ${activeTab === "scout" ? "primary" : ""}`}
+            className={`nav-btn ${activeTab === "scout" ? "active" : ""}`}
             onClick={() => setActiveTab("scout")}
           >
-            📋 Scout Table
+            📋 Scout
           </button>
           <button
-            className={`btn ${activeTab === "compare" ? "primary" : ""}`}
-            onClick={() => setActiveTab("compare")}
-          >
-            ⚖️ Comparison {comparedIds.length > 0 ? `(${comparedIds.length})` : ""}
-          </button>
-          <button
-            className={`btn ${activeTab === "gaps" ? "primary" : ""}`}
-            onClick={() => setActiveTab("gaps")}
-          >
-            🛡️ Squad Gaps
-          </button>
-          <button
-            className={`btn ${activeTab === "squad" ? "primary" : ""}`}
+            className={`nav-btn ${activeTab === "squad" ? "active" : ""}`}
             onClick={() => setActiveTab("squad")}
           >
-            🏟️ Squad Overview
+            🏟️ Squad
           </button>
           <button
-            className={`btn ${activeTab === "advisor" ? "primary" : ""}`}
-            onClick={() => setActiveTab("advisor")}
-          >
-            💡 Recruitment Advisor
-          </button>
-          <button
-            className={`btn ${activeTab === "shortlist" ? "primary" : ""}`}
+            className={`nav-btn ${activeTab === "shortlist" ? "active" : ""}`}
             onClick={() => setActiveTab("shortlist")}
           >
-            ⭐ Shortlist {shortlistIds.length > 0 ? `(${shortlistIds.length})` : "(0)"}
+            ⭐ Shortlist {shortlistIds.length > 0 && <span style={{ background: "var(--accent)", color: "#fff", borderRadius: 99, padding: "0 5px", fontSize: 10, fontWeight: 700 }}>{shortlistIds.length}</span>}
+          </button>
+          <button
+            className={`nav-btn ${activeTab === "compare" ? "active" : ""}`}
+            onClick={() => setActiveTab("compare")}
+          >
+            ⚖️ Compare {comparedIds.length > 0 && <span style={{ background: "var(--accent)", color: "#fff", borderRadius: 99, padding: "0 5px", fontSize: 10, fontWeight: 700 }}>{comparedIds.length}</span>}
+          </button>
+          <button
+            className={`nav-btn ${activeTab === "gaps" ? "active" : ""}`}
+            onClick={() => setActiveTab("gaps")}
+          >
+            🛡️ Gaps
+          </button>
+          <button
+            className={`nav-btn ${activeTab === "advisor" ? "active" : ""}`}
+            onClick={() => setActiveTab("advisor")}
+          >
+            💡 Advisor
           </button>
         </nav>
       )}
@@ -73,8 +73,8 @@ function TopBar() {
       <div className="topbar-spacer" />
 
       {dump && (
-        <span className="topbar-meta" style={{ marginRight: 12 }}>
-          <strong>{dump.meta.myClub || (dump.meta.manager ? `Manager: ${dump.meta.manager.replace(/[()]/g, '')}` : "Active Save")}</strong> {dump.meta.gameVersion ? `(FM v${dump.meta.gameVersion})` : ""} · {dump.players.length.toLocaleString()} players loaded
+        <span className="topbar-meta">
+          <strong>{dump.meta.myClub || "Active Save"}</strong> · {dump.players.length.toLocaleString()} players
         </span>
       )}
 
@@ -86,28 +86,30 @@ function TopBar() {
         onChange={(e) => { const f = e.target.files?.[0]; if (f) loadFile(f); }}
       />
 
-      <div style={{ display: "flex", gap: 8 }}>
-        <a 
-          href="https://ko-fi.com/jellyvin" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          className="btn" 
-          style={{ backgroundColor: "#13C3FF", color: "#fff", border: "none", fontWeight: 600, padding: "0 16px" }}
+      <div className="topbar-divider" />
+
+      <div className="topbar-actions">
+        <a
+          href="https://ko-fi.com/jellyvin"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn"
+          style={{ backgroundColor: "#13C3FF", color: "#fff", border: "none", fontWeight: 600, padding: "0 12px", fontSize: 12 }}
           title="Support the development of FM Analyzer on Ko-fi"
         >
-          ☕ Support Me
+          ☕ Support
         </a>
-        
+
         {dump && (
           <>
-            <button className="btn primary" onClick={handleSync} title="Sync updated save state directly from FM26">
-              ⚡ Sync Live Save
+            <button className="btn primary" onClick={handleSync} title="Sync updated save state directly from FM26" style={{ fontSize: 12, padding: "5px 12px" }}>
+              ⚡ Sync
             </button>
-            <button className="btn" onClick={() => inputRef.current?.click()} title="Load another dump file">
-              📂 Load file
+            <button className="btn" onClick={() => inputRef.current?.click()} title="Load another dump file" style={{ fontSize: 12, padding: "5px 10px" }}>
+              📂
             </button>
-            <button className="btn danger" onClick={() => unloadDump()} title="Clear current save data from view">
-              ✕ Clear
+            <button className="btn danger" onClick={() => unloadDump()} title="Clear current save data" style={{ fontSize: 12, padding: "5px 10px" }}>
+              ✕
             </button>
           </>
         )}
