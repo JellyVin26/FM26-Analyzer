@@ -1,16 +1,11 @@
-import { useEffect, useRef, useState, type DragEvent } from "react";
+import { useRef, useState, type DragEvent } from "react";
 import { useLoadDump } from "../hooks/useLoadDump";
 
 export function FileDrop() {
-  const { loadFile, loadFromAutoDump, syncLiveSave, error } = useLoadDump();
+  const { loadFile, syncLiveSave, error } = useLoadDump();
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
-  const [checking, setChecking] = useState(true);
-
-  useEffect(() => {
-    // Automatically attempt to fetch local FM26 save dump on page load
-    loadFromAutoDump().finally(() => setChecking(false));
-  }, [loadFromAutoDump]);
+  const [checking, setChecking] = useState(false);
 
   const onFile = (file: File | undefined) => { if (file) loadFile(file); };
 

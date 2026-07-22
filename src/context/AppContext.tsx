@@ -141,28 +141,33 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (filters.valueMax) list = list.filter((p) => p.value <= +filters.valueMax);
 
     if (sortKey === "role_ip") {
-      list = [...list].sort((a, b) => {
-        const av = filters.ipRole ? (scoreSingleRole(a, filters.ipRole)?.ipScore ?? 0) : (topIpRoles(a, 1)[0]?.ipScore ?? 0);
-        const bv = filters.ipRole ? (scoreSingleRole(b, filters.ipRole)?.ipScore ?? 0) : (topIpRoles(b, 1)[0]?.ipScore ?? 0);
-        return sortDir === "desc" ? bv - av : av - bv;
-      });
+      list = list
+        .map(p => ({
+          p,
+          val: filters.ipRole ? (scoreSingleRole(p, filters.ipRole)?.ipScore ?? 0) : (topIpRoles(p, 1)[0]?.ipScore ?? 0)
+        }))
+        .sort((a, b) => sortDir === "desc" ? b.val - a.val : a.val - b.val)
+        .map(o => o.p);
     } else if (sortKey === "role_oop") {
-      list = [...list].sort((a, b) => {
-        const av = filters.oopRole ? (scoreSingleRole(a, filters.oopRole)?.oopScore ?? 0) : (topOopRoles(a, 1)[0]?.oopScore ?? 0);
-        const bv = filters.oopRole ? (scoreSingleRole(b, filters.oopRole)?.oopScore ?? 0) : (topOopRoles(b, 1)[0]?.oopScore ?? 0);
-        return sortDir === "desc" ? bv - av : av - bv;
-      });
-    } else if (sortKey === "value") {
-      list = [...list].sort((a, b) => {
-        const av = getPlayerValue(a);
-        const bv = getPlayerValue(b);
-        return sortDir === "desc" ? bv - av : av - bv;
-      });
+      list = list
+        .map(p => ({
+          p,
+          val: filters.oopRole ? (scoreSingleRole(p, filters.oopRole)?.oopScore ?? 0) : (topOopRoles(p, 1)[0]?.oopScore ?? 0)
+        }))
+        .sort((a, b) => sortDir === "desc" ? b.val - a.val : a.val - b.val)
+        .map(o => o.p);
     } else {
-      const key = sortKey as keyof Player;
       list = [...list].sort((a, b) => {
-        const av = (a[key] as number) ?? 0;
-        const bv = (b[key] as number) ?? 0;
+        if (sortKey === "name") return sortDir === "desc" ? (b.name || "").localeCompare(a.name || "") : (a.name || "").localeCompare(b.name || "");
+        if (sortKey === "club") return sortDir === "desc" ? (b.club || "").localeCompare(a.club || "") : (a.club || "").localeCompare(b.club || "");
+        if (sortKey === "pos") return sortDir === "desc" ? (b.pos || "").localeCompare(a.pos || "") : (a.pos || "").localeCompare(b.pos || "");
+        if (sortKey === "value") {
+          const av = getPlayerValue(a);
+          const bv = getPlayerValue(b);
+          return sortDir === "desc" ? bv - av : av - bv;
+        }
+        const av = (a as any)[sortKey] ?? 0;
+        const bv = (b as any)[sortKey] ?? 0;
         return sortDir === "desc" ? bv - av : av - bv;
       });
     }
