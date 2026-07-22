@@ -21,6 +21,8 @@ interface Filters {
   contractExpiry: string;
 }
 
+export type TabView = "scout" | "compare" | "gaps" | "advisor";
+
 interface AppState {
   dump: Dump | null;
   loading: boolean;
@@ -29,6 +31,8 @@ interface AppState {
   sortKey: keyof Player | "value" | "role_ip" | "role_oop";
   sortDir: "asc" | "desc";
   selectedId: number | null;
+  activeTab: TabView;
+  comparedIds: number[];
   setDump: (d: Dump) => void;
   setLoading: (v: boolean) => void;
   setHiddenMode: (v: boolean) => void;
@@ -36,6 +40,10 @@ interface AppState {
   resetFilters: () => void;
   setSort: (k: AppState["sortKey"]) => void;
   setSelectedId: (id: number | null) => void;
+  setActiveTab: (tab: TabView) => void;
+  addComparePlayer: (id: number, navigate?: boolean) => void;
+  removeComparePlayer: (id: number) => void;
+  clearComparePlayers: () => void;
   filteredPlayers: Player[];
 }
 
@@ -55,12 +63,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [sortKey, setSortKey] = useState<AppState["sortKey"]>("ca");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<TabView>("scout");
+  const [comparedIds, setComparedIds] = useState<number[]>([]);
 
   const setDump = useCallback((d: Dump) => { setDump_(d); }, []);
   const setFilter = useCallback((k: keyof Filters, v: string) => {
     setFilters((f) => ({ ...f, [k]: v }));
   }, []);
   const resetFilters = useCallback(() => setFilters(DEFAULT_FILTERS), []);
+
+  const addComparePlayer = useCallback((id: number, navigate = true) => {
+    setComparedIds((prev) => {
+      if (prev.includes(id)) return prev;
+      if (prev.length >= 3) return [...prev.slice(1), id];
+      return [...prev, id];
+    });
+    if (navigate) setActiveTab("compare");
+  }, []);
+
+  const removeComparePlayer = useCallback((id: number) => {
+    setComparedIds((prev) => prev.filter((i) => i !== id));
+  }, []);
+
+  const clearComparePlayers = useCallback(() => {
+    setComparedIds([]);
+  }, []);
 
   const setSort = useCallback((k: AppState["sortKey"]) => {
     setSortKey((prev) => {
@@ -137,8 +164,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <Ctx.Provider value={{
       dump, loading, hiddenMode, filters, sortKey, sortDir, selectedId,
+      activeTab, comparedIds,
       setDump, setLoading, setHiddenMode, setFilter, resetFilters, setSort,
-      setSelectedId, filteredPlayers,
+      setSelectedId, setActiveTab, addComparePlayer, removeComparePlayer, clearComparePlayers,
+      filteredPlayers,
     }}>
       {children}
     </Ctx.Provider>

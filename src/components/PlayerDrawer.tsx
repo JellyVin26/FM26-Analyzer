@@ -50,7 +50,7 @@ const HIDDEN_ATTRS: Array<[string, keyof Player]> = [
 ];
 
 export function PlayerDrawer() {
-  const { dump, selectedId, setSelectedId, hiddenMode } = useApp();
+  const { dump, selectedId, setSelectedId, hiddenMode, addComparePlayer, comparedIds } = useApp();
 
   const player = useMemo(
     () => dump?.players.find((p) => p.id === selectedId),
@@ -81,7 +81,16 @@ export function PlayerDrawer() {
               </div>
             )}
           </div>
-          <button className="drawer-close" onClick={close}>✕</button>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <button
+              className={`btn ${comparedIds.includes(player.id) ? "primary" : ""}`}
+              style={{ fontSize: 11 }}
+              onClick={() => addComparePlayer(player.id, true)}
+            >
+              {comparedIds.includes(player.id) ? "✓ Compared" : "⚖️ Compare"}
+            </button>
+            <button className="drawer-close" onClick={close}>✕</button>
+          </div>
         </div>
 
         <div className="drawer-body">

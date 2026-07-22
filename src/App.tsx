@@ -1,5 +1,5 @@
 import "./index.css";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { useApp } from "./context/AppContext";
 import { Sidebar } from "./components/Sidebar";
 import { PlayerTable } from "./components/PlayerTable";
@@ -10,10 +10,8 @@ import { SquadGapAnalysis } from "./components/SquadGapAnalysis";
 import { BuySellLoanAdvisor } from "./components/BuySellLoanAdvisor";
 import { useLoadDump } from "./hooks/useLoadDump";
 
-type TabView = "scout" | "compare" | "gaps" | "advisor";
-
-function TopBar({ activeTab, setActiveTab }: { activeTab: TabView; setActiveTab: (t: TabView) => void }) {
-  const { dump } = useApp();
+function TopBar() {
+  const { dump, activeTab, setActiveTab, comparedIds } = useApp();
   const { loadFile } = useLoadDump();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -37,7 +35,7 @@ function TopBar({ activeTab, setActiveTab }: { activeTab: TabView; setActiveTab:
             className={`btn ${activeTab === "compare" ? "primary" : ""}`}
             onClick={() => setActiveTab("compare")}
           >
-            ⚖️ Comparison
+            ⚖️ Comparison {comparedIds.length > 0 ? `(${comparedIds.length})` : ""}
           </button>
           <button
             className={`btn ${activeTab === "gaps" ? "primary" : ""}`}
@@ -80,13 +78,12 @@ function TopBar({ activeTab, setActiveTab }: { activeTab: TabView; setActiveTab:
 }
 
 export function App() {
-  const { dump, loading } = useApp();
-  const [activeTab, setActiveTab] = useState<TabView>("scout");
+  const { dump, loading, activeTab } = useApp();
 
   return (
     <div className="app-shell">
       {loading && <div className="loading-bar" />}
-      <TopBar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <TopBar />
       <div className="main-content">
         {dump ? (
           activeTab === "scout" ? (

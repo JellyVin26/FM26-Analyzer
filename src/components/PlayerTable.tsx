@@ -34,7 +34,7 @@ interface Row {
 }
 
 export function PlayerTable() {
-  const { filteredPlayers, setSelectedId, selectedId, sortKey, sortDir, setSort, hiddenMode, filters } = useApp();
+  const { filteredPlayers, setSelectedId, selectedId, sortKey, sortDir, setSort, hiddenMode, filters, addComparePlayer, comparedIds } = useApp();
   const [page, setPage] = useState(0);
 
   const ipRoleName = filters.ipRole ? ROLE_BY_ID[filters.ipRole]?.name || filters.ipRole : null;
@@ -142,6 +142,7 @@ export function PlayerTable() {
                 <Th label="IP" k="role_ip" />
                 <Th label="OOP" k="role_oop" />
                 <th>Expires</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -187,6 +188,19 @@ export function PlayerTable() {
                     <span className={`score-chip ${scoreClass(topOopScore)}`}>{topOopScore}</span>
                   </td>
                   <td style={{ color: "var(--text-muted)", fontSize: 11 }}>{p.expires ? p.expires.slice(0, 7) : "N/A"}</td>
+                  <td>
+                    <button
+                      className={`btn ${comparedIds.includes(p.id) ? "primary" : ""}`}
+                      style={{ padding: "2px 8px", fontSize: 11 }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addComparePlayer(p.id, true);
+                      }}
+                      title="Compare this player"
+                    >
+                      {comparedIds.includes(p.id) ? "✓ Added" : "⚖️ Compare"}
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

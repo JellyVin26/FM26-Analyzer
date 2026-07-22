@@ -25,8 +25,7 @@ const ATTR_GROUPS = [
 ];
 
 export function PlayerComparison() {
-  const { dump, hiddenMode } = useApp();
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const { dump, hiddenMode, comparedIds, addComparePlayer, removeComparePlayer } = useApp();
   const [search, setSearch] = useState("");
 
   const allPlayers = dump?.players || [];
@@ -37,19 +36,13 @@ export function PlayerComparison() {
         .slice(0, 8)
     : [];
 
-  const comparedPlayers = selectedIds
+  const comparedPlayers = comparedIds
     .map((id) => allPlayers.find((p) => p.id === id))
     .filter((p): p is Player => Boolean(p));
 
   const addPlayer = (p: Player) => {
-    if (selectedIds.length < 3 && !selectedIds.includes(p.id)) {
-      setSelectedIds([...selectedIds, p.id]);
-      setSearch("");
-    }
-  };
-
-  const removePlayer = (id: number) => {
-    setSelectedIds(selectedIds.filter((i) => i !== id));
+    addComparePlayer(p.id, false);
+    setSearch("");
   };
 
   return (
@@ -63,7 +56,7 @@ export function PlayerComparison() {
         </div>
 
         {/* Add Player Search Input */}
-        {selectedIds.length < 3 && (
+        {comparedIds.length < 3 && (
           <div style={{ position: "relative", width: 280 }}>
             <input
               className="search-input"
@@ -126,7 +119,7 @@ export function PlayerComparison() {
           {comparedPlayers.map((p) => (
             <div key={p.id} className="card" style={{ padding: 16, background: "var(--bg-elevated)", borderRadius: 12, border: "1px solid var(--border-color)", position: "relative" }}>
               <button
-                onClick={() => removePlayer(p.id)}
+                onClick={() => removeComparePlayer(p.id)}
                 style={{ position: "absolute", top: 12, right: 12, background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 16 }}
               >
                 ✕
