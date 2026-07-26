@@ -47,7 +47,7 @@ app.get('/api/sync', async (req, res) => {
     // Trigger the plugin by creating request.flag
     fs.writeFileSync(flagPath, '1');
 
-    const maxWaitMs = 15000;
+    const maxWaitMs = 60000;
     const pollIntervalMs = 500;
     let waited = 0;
     let dumpUpdated = false;

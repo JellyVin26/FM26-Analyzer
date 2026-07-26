@@ -26,7 +26,7 @@ function TopBar() {
       <div className="topbar-logo">
         <span>⚽</span>
         <span>FM<span className="accent">Analyzer</span></span>
-        <span className="topbar-badge">v1.0.4</span>
+        <span className="topbar-badge">v1.0.5</span>
       </div>
 
       {dump && (
