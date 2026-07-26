@@ -92,7 +92,11 @@ begin
   GameDir := GetSteamGameInstallLocation('Football Manager 26');
   
   if GameDir = '' then
+  begin
     GameDir := 'C:\Program Files (x86)\Steam\steamapps\common\Football Manager 26';
+    if not DirExists(GameDir) then
+      GameDir := ''; // Force user to browse if not found in default path
+  end;
     
   GameDirPage.Values[0] := GameDir;
 end;
@@ -100,4 +104,20 @@ end;
 function GetGameDir(Param: String): String;
 begin
   Result := GameDirPage.Values[0];
+end;
+
+function NextButtonClick(CurPageID: Integer): Boolean;
+var
+  SelectedDir: String;
+begin
+  Result := True;
+  if CurPageID = GameDirPage.ID then
+  begin
+    SelectedDir := GameDirPage.Values[0];
+    if (not FileExists(SelectedDir + '\fm26.exe')) and (not FileExists(SelectedDir + '\fm.exe')) then
+    begin
+      MsgBox('Could not find fm26.exe or fm.exe in the selected directory. Please select the actual Football Manager 26 installation folder.', mbError, MB_OK);
+      Result := False;
+    end;
+  end;
 end;

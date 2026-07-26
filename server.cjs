@@ -48,7 +48,7 @@ app.get('/api/sync', async (req, res) => {
     fs.writeFileSync(flagPath, '1');
 
     const maxWaitMs = 60000;
-    const pollIntervalMs = 500;
+    const pollIntervalMs = 50;
     let waited = 0;
     let dumpUpdated = false;
 
@@ -59,8 +59,8 @@ app.get('/api/sync', async (req, res) => {
       if (fs.existsSync(dumpPath)) {
         const currentMtime = fs.statSync(dumpPath).mtimeMs;
         if (currentMtime > initialMtime) {
-          // Wait an extra 500ms to ensure the plugin has finished writing the 67MB file
-          await new Promise(r => setTimeout(r, 500));
+          // Wait an extra 100ms to ensure the plugin has finished writing the file
+          await new Promise(r => setTimeout(r, 100));
           dumpUpdated = true;
           break;
         }
