@@ -4,19 +4,21 @@ AppVersion=1.0.5
 DefaultDirName={localappdata}\FMAnalyzer
 DefaultGroupName=FMAnalyzer
 OutputBaseFilename=FMAnalyzer-Setup
+SetupIconFile=icon.ico
 Compression=lzma2
 SolidCompression=yes
 PrivilegesRequired=lowest
 OutputDir=dist-setup
 
 [Files]
+Source: "icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "FMAnalyzer.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "bepinex_base\*"; DestDir: "{code:GetGameDir}"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist
 Source: "plugin\bin\Release\netstandard2.1\FMAnalyzer.dll"; DestDir: "{code:GetGameDir}\BepInEx\plugins"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\FMAnalyzer"; Filename: "{app}\FMAnalyzer.exe"
-Name: "{autodesktop}\FMAnalyzer"; Filename: "{app}\FMAnalyzer.exe"; Tasks: desktopicon
+Name: "{group}\FMAnalyzer"; Filename: "{app}\FMAnalyzer.exe"; IconFilename: "{app}\icon.ico"
+Name: "{autodesktop}\FMAnalyzer"; Filename: "{app}\FMAnalyzer.exe"; Tasks: desktopicon; IconFilename: "{app}\icon.ico"
 
 [Tasks]
 Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription: "Additional icons:"
