@@ -27,15 +27,74 @@ Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription
 var
   GameDirPage: TInputDirWizardPage;
 
+function GetSteamGameInstallLocation(GameName: string): string;
+var
+  UninstallKeys: TArrayOfString;
+  I: Integer;
+  DisplayName, InstallLocation: string;
+  RootKey: Integer;
+  Subkey: string;
+begin
+  Result := '';
+  RootKey := HKEY_LOCAL_MACHINE;
+  
+  // Check 64-bit registry first
+  if RegGetSubkeyNames(RootKey, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall', UninstallKeys) then
+  begin
+    for I := 0 to GetArrayLength(UninstallKeys) - 1 do
+    begin
+      Subkey := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + UninstallKeys[I];
+      if RegQueryStringValue(RootKey, Subkey, 'DisplayName', DisplayName) then
+      begin
+        if Pos(GameName, DisplayName) > 0 then
+        begin
+          if RegQueryStringValue(RootKey, Subkey, 'InstallLocation', InstallLocation) then
+          begin
+            Result := InstallLocation;
+            Exit;
+          end;
+        end;
+      end;
+    end;
+  end;
+
+  // Check 32-bit registry (WOW6432Node)
+  if RegGetSubkeyNames(RootKey, 'SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall', UninstallKeys) then
+  begin
+    for I := 0 to GetArrayLength(UninstallKeys) - 1 do
+    begin
+      Subkey := 'SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\' + UninstallKeys[I];
+      if RegQueryStringValue(RootKey, Subkey, 'DisplayName', DisplayName) then
+      begin
+        if Pos(GameName, DisplayName) > 0 then
+        begin
+          if RegQueryStringValue(RootKey, Subkey, 'InstallLocation', InstallLocation) then
+          begin
+            Result := InstallLocation;
+            Exit;
+          end;
+        end;
+      end;
+    end;
+  end;
+end;
+
 procedure InitializeWizard;
+var
+  GameDir: string;
 begin
   GameDirPage := CreateInputDirPage(wpSelectDir,
-    'Select Football Manager 2026 Directory', 'Where is Football Manager 2026 installed?',
-    'Select the folder where Football Manager 2026 is installed. This is needed to install the memory reading plugin (FMAnalyzer.dll) so the app can read your live save.',
+    'Select Football Manager 26 Directory', 'Where is Football Manager 26 installed?',
+    'Select the folder where Football Manager 26 is installed. This is needed to install the memory reading plugin (FMAnalyzer.dll) so the app can read your live save.',
     False, '');
   GameDirPage.Add('');
-  // Set default steam path
-  GameDirPage.Values[0] := 'C:\Program Files (x86)\Steam\steamapps\common\Football Manager 2026';
+  
+  GameDir := GetSteamGameInstallLocation('Football Manager 26');
+  
+  if GameDir = '' then
+    GameDir := 'C:\Program Files (x86)\Steam\steamapps\common\Football Manager 26';
+    
+  GameDirPage.Values[0] := GameDir;
 end;
 
 function GetGameDir(Param: String): String;
