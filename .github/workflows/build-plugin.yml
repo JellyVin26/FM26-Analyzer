@@ -32,8 +32,8 @@ jobs:
         if (!(Test-Path "plugin\bin\Release\netstandard2.1\FMAnalyzer.dll")) {
           Write-Error "Error: FMAnalyzer.dll not found! You must compile it on your PC and push it to GitHub."
           exit 1
-
-
+        }
+      shell: pwsh
     - name: Build Setup.exe with Inno Setup
       run: iscc installer.iss
 
