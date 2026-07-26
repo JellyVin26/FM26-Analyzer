@@ -13,7 +13,7 @@ OutputDir=dist-setup
 [Files]
 Source: "icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "FMAnalyzer.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "bepinex_base\*"; DestDir: "{code:GetGameDir}"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist
+Source: "bepinex_payload\*"; DestDir: "{code:GetGameDir}"; Flags: ignoreversion recursesubdirs skipifsourcedoesntexist
 Source: "plugin\bin\Release\netstandard2.1\FMAnalyzer.dll"; DestDir: "{code:GetGameDir}\BepInEx\plugins"; Flags: ignoreversion
 
 [Icons]
