@@ -31,11 +31,33 @@ internal sealed class MemScan
     private static extern ulong VirtualQuery(ulong lpAddress, out MEMORY_BASIC_INFORMATION lpBuffer, ulong dwLength);
 
     [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern nint GetCurrentProcess();
+    private static extern nint OpenProcess(uint dwDesiredAccess, bool bInheritHandle, int dwProcessId);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool CloseHandle(nint hObject);
+
+    [DllImport("kernel32.dll")]
+    private static extern ulong VirtualQueryEx(nint hProcess, ulong lpAddress, out MEMORY_BASIC_INFORMATION lpBuffer, ulong dwLength);
 
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern bool ReadProcessMemory(nint hProcess, ulong lpBaseAddress,
         byte[] lpBuffer, nuint nSize, out nuint lpNumberOfBytesRead);
+
+    [DllImport("psapi.dll", SetLastError = true)]
+    private static extern bool EnumProcessModulesEx(nint hProcess, [Out] nint[] lphModule, uint cb, out uint lpcbNeeded, uint dwFilterFlag);
+
+    [DllImport("psapi.dll", CharSet = CharSet.Unicode)]
+    private static extern uint GetModuleFileNameEx(nint hProcess, nint hModule, System.Text.StringBuilder lpFilename, uint nSize);
+
+    [DllImport("psapi.dll")]
+    private static extern bool GetModuleInformation(nint hProcess, nint hModule, out MODULEINFO lpmodinfo, uint cb);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MODULEINFO { public nint lpBaseOfDll; public uint SizeOfImage; public nint EntryPoint; }
+
+    private const uint PROCESS_VM_READ = 0x0010;
+    private const uint PROCESS_QUERY_INFORMATION = 0x0400;
+    private const uint LIST_MODULES_ALL = 0x03;
 
     private const uint MEM_COMMIT = 0x1000;
     private const uint MEM_PRIVATE = 0x20000;
@@ -48,7 +70,8 @@ internal sealed class MemScan
     private const uint PAGE_GUARD = 0x100;
     private const uint PAGE_NOACCESS = 0x01;
 
-    private readonly nint _proc = GetCurrentProcess();
+    private readonly nint _proc;
+    private readonly int _pid;
 
     // Regio's om te scannen naar person-objecten: private + committed + read-write (de GC-heap).
     public readonly List<(ulong start, ulong size)> ScanRegions = new();
@@ -66,13 +89,19 @@ internal sealed class MemScan
     private byte[] _gp;   // game_plugin.dll
     private byte[] _ga;   // GameAssembly.dll
 
-    public MemScan()
+    public MemScan(int pid)
     {
+        _pid = pid;
+        _proc = OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, false, pid);
+        if (_proc == IntPtr.Zero)
+            throw new System.Exception($"OpenProcess failed for PID {pid}: {Marshal.GetLastWin32Error()}");
         BuildRegions();
         FindModules();
         _gp = ReadImage(GpBase, GpEnd);
         _ga = ReadImage(GaBase, GaEnd);
     }
+
+    public void Dispose() { if (_proc != IntPtr.Zero) CloseHandle(_proc); }
 
     private byte[] ReadImage(ulong start, ulong end)
     {
@@ -132,7 +161,7 @@ internal sealed class MemScan
         int guard = 0;
         while (addr < max && guard++ < 2_000_000)
         {
-            if (VirtualQuery(addr, out var mbi, (ulong)Marshal.SizeOf<MEMORY_BASIC_INFORMATION>()) == 0)
+            if (VirtualQueryEx(_proc, addr, out var mbi, (ulong)Marshal.SizeOf<MEMORY_BASIC_INFORMATION>()) == 0)
                 break;
             if (mbi.RegionSize == 0) break;
             if (IsScannable(mbi) && mbi.RegionSize <= 512UL * 1024 * 1024)
@@ -149,14 +178,27 @@ internal sealed class MemScan
 
     private void FindModules()
     {
-        foreach (ProcessModule m in Process.GetCurrentProcess().Modules)
+        // Enumerate modules of the external FM26 process via psapi.
+        uint needed = 0;
+        EnumProcessModulesEx(_proc, null, 0, out needed, LIST_MODULES_ALL);
+        int count = (int)(needed / (uint)IntPtr.Size);
+        var handles = new nint[count];
+        if (!EnumProcessModulesEx(_proc, handles, needed, out _, LIST_MODULES_ALL)) return;
+
+        var sb = new System.Text.StringBuilder(1024);
+        foreach (var hMod in handles)
         {
-            ulong b = (ulong)m.BaseAddress.ToInt64();
-            ulong e = b + (ulong)m.ModuleMemorySize;
-            if (string.Equals(m.ModuleName, "GameAssembly.dll", StringComparison.OrdinalIgnoreCase))
+            sb.Clear();
+            GetModuleFileNameEx(_proc, hMod, sb, (uint)sb.Capacity);
+            string path = sb.ToString();
+            string name = System.IO.Path.GetFileName(path);
+            if (!GetModuleInformation(_proc, hMod, out var info, (uint)Marshal.SizeOf<MODULEINFO>())) continue;
+            ulong b = (ulong)(long)info.lpBaseOfDll;
+            ulong e = b + info.SizeOfImage;
+            if (string.Equals(name, "GameAssembly.dll", StringComparison.OrdinalIgnoreCase))
             { GaBase = b; GaEnd = e; }
-            else if (string.Equals(m.ModuleName, "game_plugin.dll", StringComparison.OrdinalIgnoreCase))
-            { GpBase = b; GpEnd = e; GpPath = m.FileName; }
+            else if (string.Equals(name, "game_plugin.dll", StringComparison.OrdinalIgnoreCase))
+            { GpBase = b; GpEnd = e; GpPath = path; }
         }
         // Grenzen over {game_plugin, GameAssembly}; de niet-gevonden module telt niet mee.
         ulong lo = ulong.MaxValue, hi = 0;

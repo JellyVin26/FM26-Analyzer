@@ -1,45 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <AssemblyName>FMAnalyzer</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <AssemblyName>FMAnalyzerScanner</AssemblyName>
     <RootNamespace>FMAnalyzer</RootNamespace>
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <!-- Geen pdb/debug-pad in de DLL: het ingebedde buildpad lekte de gebruikersmap. -->
     <DebugType>none</DebugType>
-    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <GenerateDependencyFile>false</GenerateDependencyFile>
-    <!-- Pad naar BepInEx core in de game-installatie -->
-    <BepInExCore>D:\SteamLibrary\steamapps\common\Football Manager 26\BepInEx\core</BepInExCore>
-    <!-- Interop-assemblies: eerst uit de gamemap (vers gegenereerd), anders uit de referentierepo -->
-    <InteropDir Condition="Exists('D:\SteamLibrary\steamapps\common\Football Manager 26\BepInEx\interop\FMGame.dll')">D:\SteamLibrary\steamapps\common\Football Manager 26\BepInEx\interop</InteropDir>
-    <InteropDir Condition="'$(InteropDir)' == ''">$(MSBuildThisFileDirectory)..\refs\fm26-editor-workspace\BepInEx\interop</InteropDir>
+    <SelfContained>false</SelfContained>
+    <PublishSingleFile>false</PublishSingleFile>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Reference Include="$(BepInExCore)\BepInEx.Core.dll" Private="false" />
-    <Reference Include="$(BepInExCore)\BepInEx.Unity.IL2CPP.dll" Private="false" />
-    <Reference Include="$(BepInExCore)\Il2CppInterop.Runtime.dll" Private="false" />
-    <Reference Include="$(BepInExCore)\Il2CppInterop.Common.dll" Private="false" />
-    <Reference Include="$(BepInExCore)\0Harmony.dll" Private="false" />
-    <Reference Include="$(InteropDir)\Il2Cppmscorlib.dll" Private="false" />
-    <Reference Include="$(InteropDir)\Il2CppSystem.dll" Private="false" />
-    <Reference Include="$(InteropDir)\Il2CppSystem.Core.dll" Private="false" />
-    <Reference Include="$(InteropDir)\FMGame.dll" Private="false" />
-    <Reference Include="$(InteropDir)\FM.GamePlugin.dll" Private="false" />
-    <Reference Include="$(InteropDir)\FM.GameConfig.dll" Private="false" />
-    <Reference Include="$(InteropDir)\FM.UI.dll" Private="false" />
-    <Reference Include="$(InteropDir)\SI.Core.dll" Private="false" />
-    <Reference Include="$(InteropDir)\SI.Services.dll" Private="false" />
-    <Reference Include="$(InteropDir)\SI.Bindable.dll" Private="false" />
-    <Reference Include="$(InteropDir)\SI.UI.dll" Private="false" />
-    <Reference Include="$(InteropDir)\Assembly-CSharp.dll" Private="false" />
-    <Reference Include="$(InteropDir)\UnityEngine.CoreModule.dll" Private="false" />
-    <Reference Include="$(InteropDir)\Unity.InputSystem.dll" Private="false" />
-  </ItemGroup>
+  <!-- No BepInEx references needed — pure Win32 P/Invoke only -->
 
 </Project>

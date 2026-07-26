@@ -33,41 +33,22 @@ app.get('/api/sync', async (req, res) => {
     const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
     const analyzerDir = path.join(localAppData, 'FMAnalyzer');
     const dumpPath = path.join(analyzerDir, 'data.json');
-    const flagPath = path.join(analyzerDir, 'request.flag');
-    
-    if (!fs.existsSync(analyzerDir)) {
-      fs.mkdirSync(analyzerDir, { recursive: true });
-    }
-
-    let initialMtime = 0;
-    if (fs.existsSync(dumpPath)) {
-      initialMtime = fs.statSync(dumpPath).mtimeMs;
-    }
-
-    // Trigger the plugin by creating request.flag
-    fs.writeFileSync(flagPath, '1');
-
-    const maxWaitMs = 60000;
-    const pollIntervalMs = 50;
-    let waited = 0;
-    let dumpUpdated = false;
-
-    while (waited < maxWaitMs) {
-      await new Promise(r => setTimeout(r, pollIntervalMs));
-      waited += pollIntervalMs;
-
-      if (fs.existsSync(dumpPath)) {
-        const currentMtime = fs.statSync(dumpPath).mtimeMs;
-        if (currentMtime > initialMtime) {
-          // Wait an extra 100ms to ensure the plugin has finished writing the file
-          await new Promise(r => setTimeout(r, 100));
-          dumpUpdated = true;
-          break;
-        }
+    const scannerPath = path.join(path.dirname(process.execPath), 'FMAnalyzerScanner.exe');
+    if (fs.existsSync(scannerPath)) {
+      const { execFileSync } = require('child_process');
+      execFileSync(scannerPath, ['--now'], { stdio: 'inherit' });
+    } else {
+      // Fallback for development if scanner is not bundled
+      const devScannerPath = path.join(__dirname, 'plugin', 'bin', 'Release', 'win-x64', 'publish', 'FMAnalyzerScanner.exe');
+      if (fs.existsSync(devScannerPath)) {
+        const { execFileSync } = require('child_process');
+        execFileSync(devScannerPath, ['--now'], { stdio: 'inherit' });
+      } else {
+        throw new Error('FMAnalyzerScanner.exe not found! Make sure it is bundled with the application.');
       }
     }
 
-    if (dumpUpdated && fs.existsSync(dumpPath)) {
+    if (fs.existsSync(dumpPath)) {
       res.setHeader('Content-Type', 'application/json');
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');

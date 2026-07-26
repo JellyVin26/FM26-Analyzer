@@ -53,8 +53,8 @@ export default defineConfig({
             // Trigger the plugin by creating request.flag
             fs.writeFileSync(flagPath, '1');
 
-            const maxWaitMs = 15000;
-            const pollIntervalMs = 500;
+            const maxWaitMs = 60000;
+            const pollIntervalMs = 50;
             let waited = 0;
             let dumpUpdated = false;
 

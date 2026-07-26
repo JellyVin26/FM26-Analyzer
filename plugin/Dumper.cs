@@ -77,10 +77,10 @@ internal static class Dumper
     // JSON: negatief (onbekend) → null, anders getal.
     private static void Money(JsonWriter j, string key, long v) { if (v < 0) j.Null4(key); else j.Prop(key, v); }
 
-    public static void DumpAll()
+    public static void DumpAll(int fmPid)
     {
         var sw = Stopwatch.StartNew();
-        Plugin.Log.LogInfo("FMAnalyzer: geheugen scannen…");
+        Console.WriteLine("FMAnalyzer: geheugen scannen…");
         Directory.CreateDirectory(OutDir);
         WriteStatus("scanning", 0, 0);
         // Alle dump-specifieke statische staat resetten: mislukt de detectie in déze save,
@@ -96,19 +96,19 @@ internal static class Dumper
         long tPrev = 0;
         void Phase(string name) { long now = sw.ElapsedMilliseconds; PhaseLog.Add($"{name}: {now - tPrev} ms"); tPrev = now; }
 
-        var mem = new MemScan();
+        var mem = new MemScan(fmPid);
         Phase("MemScan-ctor (image-reads)");
         if (mem.GaBase == 0)
         {
-            Plugin.Log.LogError("GameAssembly.dll niet gevonden — kan niet dumpen.");
+            Console.WriteLine("GameAssembly.dll niet gevonden — kan niet dumpen.");
             WriteError("GameAssembly.dll niet gevonden. Is FM26 goed geladen?");
             return;
         }
-        Plugin.Log.LogInfo($"Scanregio's: {mem.ScanRegions.Count}, GameAssembly {mem.GaBase:X}-{mem.GaEnd:X}, " +
+        Console.WriteLine($"Scanregio's: {mem.ScanRegions.Count}, GameAssembly {mem.GaBase:X}-{mem.GaEnd:X}, " +
                            $"game_plugin {mem.GpBase:X}-{mem.GpEnd:X}");
         DetectGameVersion(mem);
         if (mem.GpBase == 0)
-            Plugin.Log.LogWarning("game_plugin.dll niet gevonden! Person-objecten leven daar — dump zal leeg zijn.");
+            Console.WriteLine("game_plugin.dll niet gevonden! Person-objecten leven daar — dump zal leeg zijn.");
 
         var players = new Dictionary<uint, Person>();
         var staff = new Dictionary<uint, Person>();
@@ -252,7 +252,7 @@ internal static class Dumper
             candidates += L.Candidates; vtGp += L.VtGp; women += L.Women;
         }
         Phase("hoofdscan (parallel, geheugen doorlopen)");
-        Plugin.Log.LogInfo($"vtables in game_plugin: {vtGp:N0} van {candidates:N0} kandidaten · {women:N0} vrouwen overgeslagen");
+        Console.WriteLine($"vtables in game_plugin: {vtGp:N0} van {candidates:N0} kandidaten · {women:N0} vrouwen overgeslagen");
         Dumper.AllOffHist = allOffHist;
         Dumper.VtGp = vtGp;
         WriteStatus("scanning", players.Count, staff.Count, null, 0.87);
@@ -369,7 +369,7 @@ internal static class Dumper
             }
         }
         Phase("squad-walk 2 (contract-keten-clubs)");
-        Plugin.Log.LogInfo($"Squad-walk v2: {squadClub.Count} spelers gekoppeld over {clubAddrs.Count} keten-clubs.");
+        Console.WriteLine($"Squad-walk v2: {squadClub.Count} spelers gekoppeld over {clubAddrs.Count} keten-clubs.");
 
         // Koppel clubs aan spelers (squad wint; anders blijft contract-keten-fallback staan).
         foreach (var p in players.Values)
@@ -396,7 +396,7 @@ internal static class Dumper
         if (me.person == 0 && managers.Count > 0) me = managers[0];
         ManagerName = me.name;
         if (MyClub == null) { MyClub = me.club; MyClubRep = me.rep; }
-        Plugin.Log.LogInfo($"Manager: {ManagerName ?? "?"} · club: {MyClub ?? "?"} (rep {MyClubRep}) · " +
+        Console.WriteLine($"Manager: {ManagerName ?? "?"} · club: {MyClub ?? "?"} (rep {MyClubRep}) · " +
                            $"{clubObjs.Count} clubs, {squadClub.Count} spelers via selectie gekoppeld");
 
         // Huidig seizoensjaar afleiden uit de data: de jeugdinstroom genereert elk jaar
@@ -408,7 +408,7 @@ internal static class Dumper
                 byHist[pl.BirthYear] = byHist.GetValueOrDefault(pl.BirthYear) + 1;
         int youngestCohort = byHist.Where(kv => kv.Value >= 30).Select(kv => kv.Key).DefaultIfEmpty(0).Max();
         GameYear = youngestCohort > 0 ? youngestCohort + 16 : DateTime.Now.Year;
-        Plugin.Log.LogInfo($"Afgeleid seizoensjaar: {GameYear} (jongste cohort {youngestCohort})");
+        Console.WriteLine($"Afgeleid seizoensjaar: {GameYear} (jongste cohort {youngestCohort})");
 
         // ---- Exacte in-game datum (best effort) ----
         // Zoek in de statics/code van game_plugin naar u32's die exact een FM-datum coderen
@@ -430,9 +430,9 @@ internal static class Dumper
         var staffAlsoPlayer = staff.Keys.Where(uid => players.ContainsKey(uid)).ToList();
         DiagStaffAlsoPlayer = staffAlsoPlayer.Count;
         foreach (var uid in staffAlsoPlayer) staff.Remove(uid);
-        Plugin.Log.LogInfo($"Speler/staf-ontdubbeling: staf ruw {DiagStaffRaw}, ook speler {DiagStaffAlsoPlayer}, netto staf {staff.Count}.");
+        Console.WriteLine($"Speler/staf-ontdubbeling: staf ruw {DiagStaffRaw}, ook speler {DiagStaffAlsoPlayer}, netto staf {staff.Count}.");
 
-        Plugin.Log.LogInfo($"Gevonden: {players.Count} spelers, {staff.Count} staf " +
+        Console.WriteLine($"Gevonden: {players.Count} spelers, {staff.Count} staf " +
                            $"({candidates:N0} kandidaten, {sw.ElapsedMilliseconds} ms). JSON schrijven…");
         WriteStatus("scanning", players.Count, staff.Count, null, 0.90);
 
@@ -440,7 +440,7 @@ internal static class Dumper
         Phase("JSON schrijven");
         WriteDiag(mem, players, staff, offsetHist, candidates, sw.ElapsedMilliseconds);
 
-        Plugin.Log.LogInfo($"Klaar in {sw.ElapsedMilliseconds} ms. Bestand in {OutDir}. " +
+        Console.WriteLine($"Klaar in {sw.ElapsedMilliseconds} ms. Bestand in {OutDir}. " +
                            "Open de FMAnalyzer web-app en klik Verversen.");
         WriteStatus("done", players.Count, staff.Count);   // web-app-banner leest dit
     }
@@ -699,9 +699,9 @@ internal static class Dumper
             GameVersion = fvi.FileVersion;
             if (string.IsNullOrEmpty(GameVersion)) return;   // geen versie-info: geen oordeel
             VersionOk = fvi.FileMajorPart == Fields.SUPPORTED_MAJOR && fvi.FileMinorPart == Fields.SUPPORTED_MINOR;
-            Plugin.Log.LogInfo($"game_plugin.dll versie {GameVersion} (offsets gepind op {Fields.SUPPORTED_VERSION}.x → {(VersionOk ? "ok" : "AFWIJKEND")})");
+            Console.WriteLine($"game_plugin.dll versie {GameVersion} (offsets gepind op {Fields.SUPPORTED_VERSION}.x → {(VersionOk ? "ok" : "AFWIJKEND")})");
         }
-        catch (Exception e) { Plugin.Log.LogWarning("Versiedetectie mislukt: " + e.Message); }
+        catch (Exception e) { Console.WriteLine("Versiedetectie mislukt: " + e.Message); }
     }
 
     // In-game datum: gelezen van het schema-object van MIJN team ([team+0xA0]+0x94, of +0x18) =
@@ -736,11 +736,11 @@ internal static class Dumper
                 GameYear = year;
                 foreach (var p in players.Concat(staff))
                     if (p.BirthYear > 0) p.Age = AgeAt(p.BirthYear, p.BirthDoy, GameDate.Value);
-                Plugin.Log.LogInfo($"In-game datum via team-schema: {GameDate.Value:yyyy-MM-dd} (kruischeck {DateVotes.GetValueOrDefault(pin)} teamstemmen)");
+                Console.WriteLine($"In-game datum via team-schema: {GameDate.Value:yyyy-MM-dd} (kruischeck {DateVotes.GetValueOrDefault(pin)} teamstemmen)");
             }
-            else Plugin.Log.LogInfo("In-game datum: team-schema niet leesbaar — bron blijft 'derived'.");
+            else Console.WriteLine("In-game datum: team-schema niet leesbaar — bron blijft 'derived'.");
         }
-        catch (Exception e) { Plugin.Log.LogWarning("Datum-bepaling mislukt: " + e.Message); }
+        catch (Exception e) { Console.WriteLine("Datum-bepaling mislukt: " + e.Message); }
     }
 
     // ---------- output ----------
@@ -770,7 +770,7 @@ internal static class Dumper
             j.Prop("gameDateSource", "derived");
         }
         j.Prop("gameYear", gy);
-        j.Prop("pluginVersion", Plugin.Version);
+        j.Prop("pluginVersion", "0.1.38");
         j.Prop("gameVersion", GameVersion);
         j.Prop("supportedVersion", Fields.SUPPORTED_VERSION);
         j.Prop("versionOk", VersionOk);
@@ -778,7 +778,7 @@ internal static class Dumper
         j.Prop("myClub", MyClub);
         j.Prop("myClubRep", MyClubRep);
         j.Prop("currency", "GBP");
-        j.Prop("source", "FMAnalyzer plugin v" + Plugin.Version);
+        j.Prop("source", "FMAnalyzer plugin v0.1.38");
         j.EndObj();
 
         // Voortgang 0.90→1.0 tijdens het wegschrijven (laatste ~10% van de doorlooptijd).
@@ -938,7 +938,7 @@ internal static class Dumper
             foreach (var p in players.Values.Where(x => x.OwnerClub != null && x.OwnerClub != x.Club).Take(40))
                 w.WriteLine($"  {p.Name,-24} speelt: {p.Club ?? "-"}  ·  moederclub: {p.OwnerClub}");
         }
-        catch (Exception e) { Plugin.Log.LogWarning("Diag schrijven mislukt: " + e.Message); }
+        catch (Exception e) { Console.WriteLine("Diag schrijven mislukt: " + e.Message); }
     }
 }
 
