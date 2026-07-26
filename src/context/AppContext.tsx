@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useCallback, type ReactNode
 import type { Dump, Player } from "../data/types";
 import { scoreSingleRole, topIpRoles, topOopRoles } from "../engine/ratingEngine";
 import { getPlayerValue } from "../utils/valueUtils";
+import { calculateInterest } from "../utils/interestUtils";
 
 interface Filters {
   search: string;
@@ -191,10 +192,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const myRep = myClubPlayers.length > 0 ? myClubPlayers[0].clubRep : 5000; // fallback
         
         list = list.filter((p) => {
-          if (!p.club) return true; // Free agents will join
-          if (p.listed) return true; // Transfer listed will join
-          if (p.clubRep <= myRep + 500) return true; // Similar or lower rep club will join
-          return false;
+          return calculateInterest(p, myRep) >= 50;
         });
       }
     }

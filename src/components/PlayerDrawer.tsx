@@ -3,6 +3,7 @@ import { useApp } from "../context/AppContext";
 import { topIpRoles, topOopRoles } from "../engine/ratingEngine";
 import type { Player } from "../data/types";
 import { formatPlayerValue } from "../utils/valueUtils";
+import { calculateInterest } from "../utils/interestUtils";
 
 function fmt(v: number) {
   if (v >= 1_000_000) return `£${(v / 1_000_000).toFixed(1)}M`;
@@ -59,6 +60,13 @@ export function PlayerDrawer() {
     () => dump?.players.find((p) => p.id === selectedId),
     [dump, selectedId]
   );
+
+  const interestScore = useMemo(() => {
+    if (!player || !dump) return 0;
+    const myClubPlayers = dump.players.filter(p => p.club === dump.meta.myClub);
+    const myRep = myClubPlayers.length > 0 ? myClubPlayers[0].clubRep : 5000;
+    return calculateInterest(player, myRep);
+  }, [player, dump]);
 
   if (!player) return null;
 
@@ -134,6 +142,12 @@ export function PlayerDrawer() {
               <div className="stat-cell">
                 <div className="stat-cell-label">Foot</div>
                 <div className="stat-cell-val" style={{ fontSize: 12 }}>{player.foot}</div>
+              </div>
+              <div className="stat-cell">
+                <div className="stat-cell-label">Interest</div>
+                <div className="stat-cell-val" style={{ fontSize: 13, color: interestScore >= 80 ? "var(--green)" : interestScore >= 50 ? "var(--accent)" : "inherit" }}>
+                  {interestScore}
+                </div>
               </div>
             </div>
           </div>
