@@ -1,6 +1,6 @@
 [Setup]
 AppName=FMAnalyzer
-AppVersion=1.0.3
+AppVersion=1.0.4
 DefaultDirName={localappdata}\FMAnalyzer
 DefaultGroupName=FMAnalyzer
 OutputBaseFilename=FMAnalyzer-Setup
