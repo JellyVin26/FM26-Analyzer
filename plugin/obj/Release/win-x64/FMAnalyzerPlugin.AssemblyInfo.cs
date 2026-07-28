@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FMAnalyzerScanner")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7f60a2273308c3f660cd87097f35d2d388bf8c15")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3e1f0c5151cf9eb8b8cd38272ba23b46f29d790f")]
 [assembly: System.Reflection.AssemblyProductAttribute("FMAnalyzerScanner")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FMAnalyzerScanner")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

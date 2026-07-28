@@ -699,9 +699,9 @@ internal static class Dumper
             GameVersion = fvi.FileVersion;
             if (string.IsNullOrEmpty(GameVersion)) return;   // geen versie-info: geen oordeel
             VersionOk = fvi.FileMajorPart == Fields.SUPPORTED_MAJOR && fvi.FileMinorPart == Fields.SUPPORTED_MINOR;
-            Console.WriteLine($"game_plugin.dll versie {GameVersion} (offsets gepind op {Fields.SUPPORTED_VERSION}.x → {(VersionOk ? "ok" : "AFWIJKEND")})");
+            Console.WriteLine($"game_plugin.dll version {GameVersion} (offsets pinned at {Fields.SUPPORTED_VERSION}.x → {(VersionOk ? "ok" : "DEVIATING")})");
         }
-        catch (Exception e) { Console.WriteLine("Versiedetectie mislukt: " + e.Message); }
+        catch (Exception e) { Console.WriteLine("Version detection failed: " + e.Message); }
     }
 
     // In-game datum: gelezen van het schema-object van MIJN team ([team+0xA0]+0x94, of +0x18) =
@@ -736,11 +736,11 @@ internal static class Dumper
                 GameYear = year;
                 foreach (var p in players.Concat(staff))
                     if (p.BirthYear > 0) p.Age = AgeAt(p.BirthYear, p.BirthDoy, GameDate.Value);
-                Console.WriteLine($"In-game datum via team-schema: {GameDate.Value:yyyy-MM-dd} (kruischeck {DateVotes.GetValueOrDefault(pin)} teamstemmen)");
+                Console.WriteLine($"In-game date via team schedule: {GameDate.Value:yyyy-MM-dd} (cross-check {DateVotes.GetValueOrDefault(pin)} team votes)");
             }
-            else Console.WriteLine("In-game datum: team-schema niet leesbaar — bron blijft 'derived'.");
+            else Console.WriteLine("In-game date: team schedule unreadable — source remains 'derived'.");
         }
-        catch (Exception e) { Console.WriteLine("Datum-bepaling mislukt: " + e.Message); }
+        catch (Exception e) { Console.WriteLine("Date determination failed: " + e.Message); }
     }
 
     // ---------- output ----------
@@ -938,7 +938,7 @@ internal static class Dumper
             foreach (var p in players.Values.Where(x => x.OwnerClub != null && x.OwnerClub != x.Club).Take(40))
                 w.WriteLine($"  {p.Name,-24} speelt: {p.Club ?? "-"}  ·  moederclub: {p.OwnerClub}");
         }
-        catch (Exception e) { Console.WriteLine("Diag schrijven mislukt: " + e.Message); }
+        catch (Exception e) { Console.WriteLine("Writing diagnostic file failed: " + e.Message); }
     }
 }
 
