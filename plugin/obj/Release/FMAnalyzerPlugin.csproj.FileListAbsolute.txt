@@ -2,8 +2,10 @@ C:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\FMAnalyz
 C:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\FMAnalyzerPlugin.AssemblyInfoInputs.cache
 C:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\FMAnalyzerPlugin.AssemblyInfo.cs
 C:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\FMAnalyzerPlugin.csproj.CoreCompileInputs.cache
-C:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\bin\Release\FMAnalyzer.dll
-C:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\FMAnalyzerPlugin.csproj.AssemblyReference.cache
-C:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\FMAnalyzer.dll
-C:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\refint\FMAnalyzer.dll
-C:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\ref\FMAnalyzer.dll
+c:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\bin\Release\FMAnalyzerScanner.exe
+c:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\bin\Release\FMAnalyzerScanner.runtimeconfig.json
+c:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\bin\Release\FMAnalyzerScanner.dll
+c:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\FMAnalyzerScanner.dll
+c:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\refint\FMAnalyzerScanner.dll
+c:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\FMAnalyzerPlugin.genruntimeconfig.cache
+c:\Users\ASUS\.gemini\antigravity\scratch\fm26-scout\plugin\obj\Release\ref\FMAnalyzerScanner.dll

@@ -80,7 +80,7 @@ internal static class Dumper
     public static void DumpAll(int fmPid)
     {
         var sw = Stopwatch.StartNew();
-        Console.WriteLine("FMAnalyzer: geheugen scannen…");
+        Console.WriteLine("FMAnalyzer: scanning memory.");
         Directory.CreateDirectory(OutDir);
         WriteStatus("scanning", 0, 0);
         // Alle dump-specifieke statische staat resetten: mislukt de detectie in déze save,
@@ -100,15 +100,15 @@ internal static class Dumper
         Phase("MemScan-ctor (image-reads)");
         if (mem.GaBase == 0)
         {
-            Console.WriteLine("GameAssembly.dll niet gevonden — kan niet dumpen.");
-            WriteError("GameAssembly.dll niet gevonden. Is FM26 goed geladen?");
+            Console.WriteLine("GameAssembly.dll not found - cannot dump.");
+            WriteError("GameAssembly.dll not found. Is FM26 loaded correctly?");
             return;
         }
-        Console.WriteLine($"Scanregio's: {mem.ScanRegions.Count}, GameAssembly {mem.GaBase:X}-{mem.GaEnd:X}, " +
+        Console.WriteLine($"Scan regions: {mem.ScanRegions.Count}, GameAssembly {mem.GaBase:X}-{mem.GaEnd:X}, " +
                            $"game_plugin {mem.GpBase:X}-{mem.GpEnd:X}");
         DetectGameVersion(mem);
         if (mem.GpBase == 0)
-            Console.WriteLine("game_plugin.dll niet gevonden! Person-objecten leven daar — dump zal leeg zijn.");
+            Console.WriteLine("game_plugin.dll not found! Person objects live there - dump will be empty.");
 
         var players = new Dictionary<uint, Person>();
         var staff = new Dictionary<uint, Person>();
@@ -252,7 +252,7 @@ internal static class Dumper
             candidates += L.Candidates; vtGp += L.VtGp; women += L.Women;
         }
         Phase("hoofdscan (parallel, geheugen doorlopen)");
-        Console.WriteLine($"vtables in game_plugin: {vtGp:N0} van {candidates:N0} kandidaten · {women:N0} vrouwen overgeslagen");
+        Console.WriteLine($"vtables in game_plugin: {vtGp:N0} of {candidates:N0} candidates - {women:N0} women skipped");
         Dumper.AllOffHist = allOffHist;
         Dumper.VtGp = vtGp;
         WriteStatus("scanning", players.Count, staff.Count, null, 0.87);
@@ -369,7 +369,7 @@ internal static class Dumper
             }
         }
         Phase("squad-walk 2 (contract-keten-clubs)");
-        Console.WriteLine($"Squad-walk v2: {squadClub.Count} spelers gekoppeld over {clubAddrs.Count} keten-clubs.");
+        Console.WriteLine($"Squad-walk v2: {squadClub.Count} players linked across {clubAddrs.Count} chain-clubs.");
 
         // Koppel clubs aan spelers (squad wint; anders blijft contract-keten-fallback staan).
         foreach (var p in players.Values)
@@ -396,7 +396,7 @@ internal static class Dumper
         if (me.person == 0 && managers.Count > 0) me = managers[0];
         ManagerName = me.name;
         if (MyClub == null) { MyClub = me.club; MyClubRep = me.rep; }
-        Console.WriteLine($"Manager: {ManagerName ?? "?"} · club: {MyClub ?? "?"} (rep {MyClubRep}) · " +
+        Console.WriteLine($"Manager: {ManagerName ?? "?"} - club: {MyClub ?? "?"} (rep {MyClubRep}) - " +
                            $"{clubObjs.Count} clubs, {squadClub.Count} spelers via selectie gekoppeld");
 
         // Huidig seizoensjaar afleiden uit de data: de jeugdinstroom genereert elk jaar
@@ -408,7 +408,7 @@ internal static class Dumper
                 byHist[pl.BirthYear] = byHist.GetValueOrDefault(pl.BirthYear) + 1;
         int youngestCohort = byHist.Where(kv => kv.Value >= 30).Select(kv => kv.Key).DefaultIfEmpty(0).Max();
         GameYear = youngestCohort > 0 ? youngestCohort + 16 : DateTime.Now.Year;
-        Console.WriteLine($"Afgeleid seizoensjaar: {GameYear} (jongste cohort {youngestCohort})");
+        Console.WriteLine($"Derived season year: {GameYear} (youngest cohort {youngestCohort})");
 
         // ---- Exacte in-game datum (best effort) ----
         // Zoek in de statics/code van game_plugin naar u32's die exact een FM-datum coderen
@@ -430,18 +430,18 @@ internal static class Dumper
         var staffAlsoPlayer = staff.Keys.Where(uid => players.ContainsKey(uid)).ToList();
         DiagStaffAlsoPlayer = staffAlsoPlayer.Count;
         foreach (var uid in staffAlsoPlayer) staff.Remove(uid);
-        Console.WriteLine($"Speler/staf-ontdubbeling: staf ruw {DiagStaffRaw}, ook speler {DiagStaffAlsoPlayer}, netto staf {staff.Count}.");
+        Console.WriteLine($"Player/staff de-duplication: raw staff {DiagStaffRaw}, also player {DiagStaffAlsoPlayer}, net staff {staff.Count}.");
 
-        Console.WriteLine($"Gevonden: {players.Count} spelers, {staff.Count} staf " +
-                           $"({candidates:N0} kandidaten, {sw.ElapsedMilliseconds} ms). JSON schrijven…");
+        Console.WriteLine($"Found: {players.Count} players, {staff.Count} staff " +
+                           $"({candidates:N0} candidates, {sw.ElapsedMilliseconds} ms). Writing JSON.");
         WriteStatus("scanning", players.Count, staff.Count, null, 0.90);
 
         WriteJson(players.Values, staff.Values);
         Phase("JSON schrijven");
         WriteDiag(mem, players, staff, offsetHist, candidates, sw.ElapsedMilliseconds);
 
-        Console.WriteLine($"Klaar in {sw.ElapsedMilliseconds} ms. Bestand in {OutDir}. " +
-                           "Open de FMAnalyzer web-app en klik Verversen.");
+        Console.WriteLine($"Done in {sw.ElapsedMilliseconds} ms. File in {OutDir}. " +
+                          $"({players.Count} players, {staff.Count} staff)");
         WriteStatus("done", players.Count, staff.Count);   // web-app-banner leest dit
     }
 

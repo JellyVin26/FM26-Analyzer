@@ -19,13 +19,13 @@ internal static class Program
     {
         if (args.Contains("--now"))
         {
-            Console.WriteLine("One-off dump mode geactiveerd.");
+            Console.WriteLine("One-off dump mode activated.");
             TryStartDump(true).Wait();
             return;
         }
 
-        Console.WriteLine($"FMAnalyzer Scanner — polling voor request.flag…");
-        Console.WriteLine($"(Sluit dit venster om te stoppen)");
+        Console.WriteLine($"FMAnalyzer Scanner - polling for request.flag...");
+        Console.WriteLine($"(Close this window to stop)");
 
         while (true)
         {
@@ -43,7 +43,7 @@ internal static class Program
     private static Task TryStartDump(bool synchronous = false)
     {
         if (Interlocked.CompareExchange(ref _dumpBusy, 1, 0) != 0) return Task.CompletedTask;
-        Console.WriteLine("dump starten…");
+        Console.WriteLine("starting dump...");
         var task = Task.Run(() =>
         {
             try
@@ -51,18 +51,18 @@ internal static class Program
                 var fmProcs = Process.GetProcessesByName("fm");
                 if (fmProcs.Length == 0)
                 {
-                    Console.WriteLine("FM26 niet gevonden (process 'fm' niet actief).");
-                    Dumper.WriteError("FM26 is niet gestart.");
+                    Console.WriteLine("FM26 not found (process 'fm' not active).");
+                    Dumper.WriteError("FM26 is not running.");
                     return;
                 }
                 int pid = fmProcs[0].Id;
-                Console.WriteLine($"FM26 gevonden: PID {pid}");
+                Console.WriteLine($"FM26 found: PID {pid}");
                 Dumper.DumpAll(pid);
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Dump mislukt: {e}");
-                Dumper.WriteError("Dump mislukt: " + e.Message);
+                Console.WriteLine($"Dump failed: {e}");
+                Dumper.WriteError("Dump failed: " + e.Message);
             }
             finally { Interlocked.Exchange(ref _dumpBusy, 0); }
         });
